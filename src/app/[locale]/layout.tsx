@@ -10,6 +10,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "SoundLink Music | Music-Tech Infrastructure",
   description: "La infraestructura que conecta la música con los negocios. Powered by AI & Data.",
+  icons: { icon: "/favicon.ico" },
 };
 
 export default async function RootLayout({
