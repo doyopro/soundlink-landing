@@ -378,19 +378,19 @@ export default function SoundLinkCorporate() {
       {/* ── NAVBAR ─────────────────────────────────────────────── */}
       <nav className={`fixed w-full z-50 top-0 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-sm' : 'bg-transparent'
         }`}>
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
 
           {/* LOGO — tamaño muy visible */}
           <Link href="/" className="flex items-center gap-3 group">
             <img
               src="/soundlink-icono.gif"
               alt="SoundLink"
-              className="w-12 h-12 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
+              className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
             />
             <img
               src="/sl-music.png"
               alt="SoundLink Music"
-              className="h-14 md:h-16 w-auto object-contain"
+              className="h-16 md:h-20 w-auto object-contain"
             />
           </Link>
 
@@ -552,7 +552,7 @@ export default function SoundLinkCorporate() {
                     <img
                       src="/soundband-logo.png"
                       alt="SoundBand"
-                      className="h-32 md:h-48 w-auto max-w-[80%] object-contain group-hover:scale-105 transition-transform duration-300"
+                      className="h-48 md:h-64 w-auto max-w-[90%] object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                     <Link href={t.ecosystem.soundband.url} target="_blank"
                       className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -592,7 +592,7 @@ export default function SoundLinkCorporate() {
                   <img
                     src="/soundpass-logo.png"
                     alt="SoundPass"
-                    className="h-32 md:h-40 w-auto max-w-[80%] object-contain mb-8 group-hover:scale-105 transition-transform duration-300"
+                    className="h-48 md:h-64 w-auto max-w-[90%] object-contain mb-8 group-hover:scale-105 transition-transform duration-300"
                   />
 
                   <p className="text-sm text-slate-300 leading-relaxed mb-10 font-medium">

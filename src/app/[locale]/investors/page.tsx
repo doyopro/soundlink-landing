@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
     ArrowRight,
@@ -14,1156 +14,1155 @@ import {
     Globe,
     TrendingUp,
     Music,
-    Clock,
-    FileText,
     Activity,
     Target,
     Layers,
-    Lock,
     ChevronRight,
     Mail,
     Calendar,
+    Play,
+    AlertCircle,
+    RefreshCw,
+    Database,
+    Cpu,
+    Lock,
 } from "lucide-react";
 
-// ─── ANIMATED COUNTER ────────────────────────────────────────────────────────
-function AnimatedCounter({ end, suffix = "", prefix = "" }: { end: number; suffix?: string; prefix?: string }) {
-    const [count, setCount] = useState(0);
-    const ref = useRef<HTMLSpanElement>(null);
+// ─────────────────────────────────────────────────────────────────────────────
+// ANIMATED COUNTER
+// ─────────────────────────────────────────────────────────────────────────────
+function useCountUp(end: number, duration = 1600) {
+    const [value, setValue] = useState(0);
+    const ref = useRef<HTMLDivElement>(null);
     const started = useRef(false);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting && !started.current) {
                     started.current = true;
-                    let startTime: number;
-                    const duration = 1800;
-                    const step = (timestamp: number) => {
-                        if (!startTime) startTime = timestamp;
-                        const progress = Math.min((timestamp - startTime) / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        setCount(Math.floor(eased * end));
-                        if (progress < 1) requestAnimationFrame(step);
-                        else setCount(end);
+                    let t0: number;
+                    const tick = (now: number) => {
+                        if (!t0) t0 = now;
+                        const p = Math.min((now - t0) / duration, 1);
+                        const eased = 1 - Math.pow(1 - p, 4);
+                        setValue(Math.round(eased * end));
+                        if (p < 1) requestAnimationFrame(tick);
                     };
-                    requestAnimationFrame(step);
+                    requestAnimationFrame(tick);
                 }
             },
-            { threshold: 0.3 }
+            { threshold: 0.4 }
         );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, [end]);
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, [end, duration]);
 
-    return <span ref={ref}>{prefix}{count.toLocaleString("es-ES")}{suffix}</span>;
+    return { value, ref };
 }
 
-// ─── SVG ICONS ───────────────────────────────────────────────────────────────
-const IconAI = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 0 6h-1v1a4 4 0 0 1-8 0v-1H7a3 3 0 0 1 0-6h1V6a4 4 0 0 1 4-4z" />
-        <circle cx="9" cy="9" r="1" fill="currentColor" stroke="none" />
-        <circle cx="15" cy="9" r="1" fill="currentColor" stroke="none" />
-        <path d="M9 14s1 1.5 3 1.5 3-1.5 3-1.5" />
-    </svg>
-);
-
-const IconCompliance = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <path d="M12 2L4 6v6c0 5.25 3.5 10.14 8 11.35C16.5 22.14 20 17.25 20 12V6l-8-4z" />
-        <path d="m9 12 2 2 4-4" />
-    </svg>
-);
-
-const IconBooking = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <rect x="3" y="4" width="18" height="18" rx="2" />
-        <path d="M16 2v4M8 2v4M3 10h18" />
-        <path d="m9 16 2 2 4-4" />
-    </svg>
-);
-
-const IconOperations = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07" />
-    </svg>
-);
-
-const IconROI = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-        <polyline points="16 7 22 7 22 13" />
-    </svg>
-);
-
-const IconFragment = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <circle cx="5" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="5" cy="19" r="2" />
-        <circle cx="19" cy="19" r="2" /><circle cx="12" cy="12" r="2" />
-        <path d="M7 5h5M12 7v5M7 19h5M17 5h-2M17 19h-2M5 7v5M19 7v5M5 14v2M19 14v2" />
-    </svg>
-);
-
-const IconRisk = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z" />
-        <path d="M12 9v4M12 17h.01" />
-    </svg>
-);
-
-const IconProcess = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <rect x="2" y="7" width="6" height="10" rx="1" />
-        <rect x="9" y="4" width="6" height="16" rx="1" />
-        <rect x="16" y="9" width="6" height="8" rx="1" />
-    </svg>
-);
-
-const IconLegal = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-        <path d="m9 14 2 2 4-4" />
-    </svg>
-);
-
-// ─── SECTION LABEL ───────────────────────────────────────────────────────────
-function SectionLabel({ children }: { children: React.ReactNode }) {
-    return (
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/5 text-blue-400 text-[10px] font-semibold uppercase tracking-[0.2em] mb-4">
-            {children}
-        </div>
-    );
+function Counter({ end, prefix = "", suffix = "" }: { end: number; prefix?: string; suffix?: string }) {
+    const { value, ref } = useCountUp(end);
+    return <div ref={ref}>{prefix}{value.toLocaleString("es-ES")}{suffix}</div>;
 }
 
-// ─── STAT CARD ───────────────────────────────────────────────────────────────
-function StatCard({ val, label, sub, animate = false, end = 0, prefix = "", suffix = "" }: {
-    val?: string; label: string; sub: string; animate?: boolean; end?: number; prefix?: string; suffix?: string;
+// ─────────────────────────────────────────────────────────────────────────────
+// DESIGN TOKENS
+// ─────────────────────────────────────────────────────────────────────────────
+// bg:     #0a0f1e  (deep navy-black)
+// surface:#111827  (elevated card)
+// border: #1f2937  (subtle separator)
+// blue:   #3b82f6  (primary accent)
+// blue-d: #1d4ed8  (darker)
+// text:   #f9fafb  (white-ish)
+// muted:  #6b7280  (secondary text)
+// dim:    #374151  (disabled/tertiary)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION WRAPPER
+// ─────────────────────────────────────────────────────────────────────────────
+function Section({
+    children,
+    className = "",
+    dark = false,
+}: {
+    children: React.ReactNode;
+    className?: string;
+    dark?: boolean;
 }) {
     return (
-        <div className="group p-6 rounded-2xl bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/10 hover:border-blue-500/40 transition-all duration-300">
-            <div className="text-3xl lg:text-4xl font-black text-white mb-2 tracking-tight">
-                {animate ? <AnimatedCounter end={end} prefix={prefix} suffix={suffix} /> : val}
+        <section
+            className={`py-24 md:py-32 px-6 ${dark ? "bg-[#080d1a]" : "bg-[#0a0f1e]"
+                } ${className}`}
+        >
+            <div className="max-w-6xl mx-auto">{children}</div>
+        </section>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LABEL / EYEBROW
+// ─────────────────────────────────────────────────────────────────────────────
+function Label({ children }: { children: React.ReactNode }) {
+    return (
+        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-blue-400 mb-4">
+            {children}
+        </p>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HEADING
+// ─────────────────────────────────────────────────────────────────────────────
+function H2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    return (
+        <h2
+            className={`text-4xl md:text-5xl lg:text-6xl font-black leading-[1.0] tracking-tight text-white ${className}`}
+        >
+            {children}
+        </h2>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEAM MEMBER CARD
+// ─────────────────────────────────────────────────────────────────────────────
+function TeamCard({
+    name,
+    role,
+    bio,
+    photo,
+}: {
+    name: string;
+    role: string;
+    bio: string;
+    photo: string;
+}) {
+    return (
+        <div className="flex flex-col gap-4 p-5 rounded-2xl bg-[#111827] border border-[#1f2937] hover:border-blue-500/30 transition-colors duration-300">
+            <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 bg-[#1f2937] border border-[#374151]">
+                    <img
+                        src={photo}
+                        alt={name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                    />
+                </div>
+                <div>
+                    <p className="font-bold text-sm text-white leading-tight">{name}</p>
+                    <p className="text-[11px] font-semibold text-blue-400 uppercase tracking-wider mt-0.5">
+                        {role}
+                    </p>
+                </div>
             </div>
-            <div className="text-[11px] font-bold text-blue-400 uppercase tracking-widest mb-1">{label}</div>
-            <div className="text-xs text-slate-500">{sub}</div>
+            <p className="text-xs text-[#6b7280] leading-relaxed">{bio}</p>
         </div>
     );
 }
 
-// ─── FEATURE ROW ─────────────────────────────────────────────────────────────
-function FeatureRow({ Icon, title, desc }: { Icon: React.ComponentType<{ className: string }>; title: string; desc: string }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// STAT BLOCK (big number, label, subtext)
+// ─────────────────────────────────────────────────────────────────────────────
+function StatBlock({
+    value,
+    label,
+    sub,
+    accent = false,
+    animate = false,
+    end = 0,
+    prefix = "",
+    suffix = "",
+}: {
+    value?: string;
+    label: string;
+    sub: string;
+    accent?: boolean;
+    animate?: boolean;
+    end?: number;
+    prefix?: string;
+    suffix?: string;
+}) {
     return (
-        <div className="flex gap-4 py-4 border-b border-white/[0.06] last:border-0">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 text-blue-400">
+        <div className="py-6 px-1">
+            <div
+                className={`text-4xl md:text-5xl font-black tracking-tight mb-1 ${accent ? "text-blue-400" : "text-white"
+                    }`}
+            >
+                {animate ? (
+                    <Counter end={end} prefix={prefix} suffix={suffix} />
+                ) : (
+                    value
+                )}
+            </div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280] mb-1">
+                {label}
+            </p>
+            <p className="text-xs text-[#374151]">{sub}</p>
+        </div>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROBLEM CARD
+// ─────────────────────────────────────────────────────────────────────────────
+function ProblemCard({
+    num,
+    title,
+    desc,
+    Icon,
+}: {
+    num: string;
+    title: string;
+    desc: string;
+    Icon: React.ComponentType<{ className: string }>;
+}) {
+    return (
+        <div className="relative p-6 rounded-2xl bg-[#111827] border border-[#1f2937] hover:border-[#374151] transition-colors duration-300 overflow-hidden">
+            <div className="absolute top-4 right-4 text-[#1f2937] font-black text-5xl select-none leading-none">
+                {num}
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5">
                 <Icon className="w-5 h-5" />
             </div>
-            <div>
-                <h4 className="font-semibold text-sm text-white mb-1">{title}</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
-            </div>
+            <h3 className="font-bold text-sm text-white mb-2 pr-8">{title}</h3>
+            <p className="text-xs text-[#6b7280] leading-relaxed">{desc}</p>
         </div>
     );
 }
 
-// ─── PROBLEM CARD ────────────────────────────────────────────────────────────
-function ProblemCard({ Icon, title, desc, stat }: { Icon: React.ReactNode; title: string; desc: string; stat?: string }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// PIPELINE CARD
+// ─────────────────────────────────────────────────────────────────────────────
+function PipelineCard({
+    title,
+    mrr,
+    timeframe,
+    desc,
+    Icon,
+    featured,
+}: {
+    title: string;
+    mrr: string;
+    timeframe: string;
+    desc: string;
+    Icon: React.ComponentType<{ className: string }>;
+    featured?: boolean;
+}) {
     return (
-        <div className="relative p-6 rounded-2xl bg-gradient-to-br from-red-500/5 to-transparent border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-            {stat && (
-                <div className="absolute top-4 right-4 text-xs font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">
-                    {stat}
-                </div>
-            )}
-            <div className="text-red-400 mb-4">{Icon}</div>
-            <h3 className="font-bold text-sm text-white mb-2 uppercase tracking-wide">{title}</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
-        </div>
-    );
-}
-
-// ─── TEAM MEMBER ─────────────────────────────────────────────────────────────
-function TeamMember({ name, role, bio, initials }: { name: string; role: string; bio: string; initials: string }) {
-    return (
-        <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-blue-500/30 transition-all duration-300">
-            {/* Photo placeholder — replace src with real photo */}
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500/30 to-purple-500/30 border-2 border-blue-500/30 flex items-center justify-center mb-4">
-                {/* <img src="/team/[filename].jpg" alt={name} className="w-full h-full rounded-full object-cover" /> */}
-                <span className="text-blue-300 text-sm font-bold">{initials}</span>
+        <div
+            className={`p-6 rounded-2xl border transition-colors duration-300 ${featured
+                ? "bg-blue-600/10 border-blue-500/40"
+                : "bg-[#111827] border-[#1f2937] hover:border-[#374151]"
+                }`}
+        >
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5">
+                <Icon className="w-5 h-5" />
             </div>
-            <h4 className="font-bold text-sm text-white mb-0.5">{name}</h4>
-            <p className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest mb-3">{role}</p>
-            <p className="text-xs text-slate-400 leading-relaxed">{bio}</p>
+            <h4 className="font-black text-base text-white mb-1">{title}</h4>
+            <p className={`text-sm font-bold mb-0.5 ${featured ? "text-blue-400" : "text-blue-400/70"}`}>
+                {mrr}
+            </p>
+            <p className="text-[10px] text-[#374151] uppercase tracking-widest mb-4">{timeframe}</p>
+            <p className="text-xs text-[#6b7280] leading-relaxed">{desc}</p>
         </div>
     );
 }
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-export default function InvestorDeckPage() {
-    const isSpanish = typeof window !== "undefined" && window.location.pathname.includes("/es");
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN PAGE
+// ─────────────────────────────────────────────────────────────────────────────
+export default function InvestorsPageV4() {
+    const isES =
+        typeof window !== "undefined" && window.location.pathname.includes("/es");
 
-    const problems = [
-        {
-            Icon: <IconFragment />,
-            title: isSpanish ? "Fragmentación operativa extrema" : "Extreme operational fragmentation",
-            desc: isSpanish
-                ? "Miles de hoteles, cadenas y marcas gestionan su programación musical con múltiples proveedores sin visibilidad centralizada. El resultado: caos operativo, decisiones a ciegas y oportunidades perdidas."
-                : "Thousands of hotels, chains and brands manage their music programming with multiple vendors and no centralized visibility. The result: operational chaos, blind decisions and missed opportunities.",
-            stat: "8h / semana",
-        },
-        {
-            Icon: <IconRisk />,
-            title: isSpanish ? "Riesgo legal y de compliance ignorado" : "Ignored legal and compliance risk",
-            desc: isSpanish
-                ? "El caso Sony v. Marriott es solo el principio. La mayoría de establecimientos operan sin contratos adecuados, sin seguros de artistas ni licencias verificadas, acumulando pasivos que pueden costar millones."
-                : "Sony v. Marriott is just the beginning. Most venues operate without proper contracts, artist insurance or verified licenses, accumulating liabilities that can cost millions.",
-            stat: "0% compliance",
-        },
-        {
-            Icon: <IconProcess />,
-            title: isSpanish ? "Procesos manuales sin datos ni ROI" : "Manual processes with no data or ROI",
-            desc: isSpanish
-                ? "Sin métricas de impacto, las empresas no pueden justificar su inversión musical. La duplicación de esfuerzos entre booking, producción, contratos y pagos consume tiempo y dinero sin trazabilidad."
-                : "Without impact metrics, companies can't justify their music investment. Duplication of effort across booking, production, contracts and payments wastes time and money with no traceability.",
-            stat: "0% ROI data",
-        },
-        {
-            Icon: <IconLegal />,
-            title: isSpanish ? "Experiencia inconsistente en cada venue" : "Inconsistent experience across venues",
-            desc: isSpanish
-                ? "Hoteles de 5 estrellas con música de fondo aleatoria. Marcas premium sin identidad sonora. La música en vivo se trata como gasto, no como herramienta estratégica de marca y experiencia de cliente."
-                : "5-star hotels with random background music. Premium brands without a sonic identity. Live music is treated as a cost, not as a strategic brand and customer experience tool.",
-            stat: "Reputación",
-        },
-    ];
-
-    const howItWorks = [
-        {
-            num: "01",
-            Icon: BrainCircuit,
-            title: isSpanish ? "Diagnóstico de ADN de Marca" : "Brand DNA Diagnosis",
-            desc: isSpanish
-                ? "Analizamos los KPIs de tu negocio, perfil de cliente, identidad de marca y objetivos comerciales. Nuestra IA construye un perfil musical único para cada venue y segmento."
-                : "We analyze your business KPIs, customer profile, brand identity and commercial objectives. Our AI builds a unique music profile for each venue and segment.",
-        },
-        {
-            num: "02",
-            Icon: IconBooking,
-            title: isSpanish ? "Matching Algorítmico de Artistas" : "Algorithmic Artist Matching",
-            desc: isSpanish
-                ? "Selección inteligente de artistas validados según ADN de marca, presupuesto y disponibilidad. Contratos, seguros y compliance gestionados automáticamente en la plataforma."
-                : "Intelligent selection of validated artists based on brand DNA, budget and availability. Contracts, insurance and compliance managed automatically in the platform.",
-        },
-        {
-            num: "03",
-            Icon: Activity,
-            title: isSpanish ? "Ejecución con Trazabilidad 360°" : "Execution with 360° Traceability",
-            desc: isSpanish
-                ? "Calendario, logística, producción y comunicación con el artista en un solo flujo. Dashboard en tiempo real con métricas de satisfacción, ocupación y ROI para cada evento."
-                : "Calendar, logistics, production and artist communication in a single flow. Real-time dashboard with satisfaction, occupancy and ROI metrics for each event.",
-        },
-    ];
-
-    const aiCapabilities = [
-        {
-            Icon: BrainCircuit,
-            title: isSpanish ? "Booking Intelligence" : "Booking Intelligence",
-            desc: isSpanish
-                ? "Motor de recomendación que cruza data de marca, perfil de cliente, historial de eventos y tendencias del mercado para garantizar el match perfecto artista–contexto–objetivo."
-                : "Recommendation engine crossing brand data, client profile, event history and market trends to guarantee the perfect artist–context–objective match.",
-        },
-        {
-            Icon: Zap,
-            title: isSpanish ? "Sustitución Automática" : "Automatic Substitution",
-            desc: isSpanish
-                ? "Sistema agentic que detecta cancelaciones y reasigna talento validado en tiempo real, sin fricción operativa. La operación nunca se detiene."
-                : "Agentic system that detects cancellations and reassigns validated talent in real-time, with no operational friction. The operation never stops.",
-        },
-        {
-            Icon: IconCompliance,
-            title: isSpanish ? "Compliance Automatizado" : "Automated Compliance",
-            desc: isSpanish
-                ? "Validación automática de contratos, seguros, licencias SGAE/BIEM y requisitos legales. 0% contingencias. Auditoría trazable de cada contratación."
-                : "Automatic validation of contracts, insurance, SGAE/BIEM licenses and legal requirements. 0% contingencies. Traceable audit of every booking.",
-        },
-        {
-            Icon: IconROI,
-            title: isSpanish ? "ROI Dashboard" : "ROI Dashboard",
-            desc: isSpanish
-                ? "Reportes de impacto que conectan la programación musical con métricas de negocio: ocupación, consumo, NPS, engagement en RRSS y satisfacción de cliente."
-                : "Impact reports that connect music programming with business metrics: occupancy, consumption, NPS, social media engagement and customer satisfaction.",
-        },
-    ];
-
-    const gigsData = [
-        {
-            label: "Gigs 1",
-            sessionsPerDay: "1 sesión / día",
-            subtitle: isSpanish ? "Presencia musical básica" : "Basic musical presence",
-            price: "min. 190€ / artista",
-            example: isSpanish ? "Lobby hotel 4★ — Jazz dúo viernes y sábado" : "4★ hotel lobby — Jazz duo Fri-Sat",
-        },
-        {
-            label: "Gigs 2",
-            sessionsPerDay: "2 sesiones / día",
-            subtitle: isSpanish ? "Programación continua" : "Continuous programming",
-            price: "min. 190€ / artista",
-            example: isSpanish ? "Restaurante resort — brunch + cena diaria" : "Resort restaurant — brunch + daily dinner",
-            featured: true,
-        },
-        {
-            label: "Gigs 3",
-            sessionsPerDay: "3 sesiones / día",
-            subtitle: isSpanish ? "Experiencia inmersiva" : "Immersive experience",
-            price: "min. 190€ / artista",
-            example: isSpanish ? "Hotel 5★ — pool bar + welcome + gala" : "5★ hotel — pool bar + welcome + gala",
-        },
-    ];
-
-    const marketData = [
-        { val: "$38.2B", label: isSpanish ? "Live Music Global 2025" : "Global Live Music 2025", icon: Music },
-        { val: "$91.4B", label: isSpanish ? "Music Tourism Global 2024" : "Global Music Tourism 2024", icon: Globe },
-        { val: "€725M", label: isSpanish ? "Mercado Live Music España" : "Spanish Live Music Market", icon: TrendingUp },
-        { val: "97M", label: isSpanish ? "Turistas España 2025" : "Spain Tourists 2025", icon: Users },
-    ];
-
-    const revenueProjections = [
-        {
-            timeframe: isSpanish ? "6–12 meses" : "6–12 months",
-            mrr: "50K – 150K€ MRR",
-            mix: "75% España + 25% Latam",
-            focus: isSpanish ? "Hotels & Hospitality" : "Hotels & Hospitality",
-        },
-        {
-            timeframe: isSpanish ? "12–24 meses" : "12–24 months",
-            mrr: "150K – 350K€ MRR",
-            mix: "60% España + 40% Latam",
-            focus: isSpanish ? "Hotels + Marcas + Promotores" : "Hotels + Brands + Promoters",
-            featured: true,
-        },
-        {
-            timeframe: isSpanish ? "36–60 meses" : "36–60 months",
-            mrr: "+10M ARR",
-            mix: "50% España+EU + 25% Latam + 25% US",
-            focus: isSpanish ? "Integración PMS/ERP global" : "Global PMS/ERP Integration",
-        },
-    ];
-
+    // ── TEAM DATA ──────────────────────────────────────────────────────────────
     const team = [
         {
             name: "Nicolás A. Civatti",
             role: "Founder & CEO",
-            bio: isSpanish
-                ? "Músico, productor y operador independiente. Más de 10.000 contrataciones gestionadas en España y Latam. Validó el modelo de negocio de forma independiente antes de escalar."
-                : "Musician, producer and independent operator. Over 10,000 bookings managed in Spain and Latam. Validated the business model independently before scaling.",
-            initials: "NC",
+            photo: "/nicolas-civatti.png",
+            bio: isES
+                ? "Músico, productor y operador B2B. +10.000 contrataciones gestionadas en España y Latam sin capital externo. Construyó SoundLink validando cada hipótesis con contratos reales."
+                : "Musician, producer and B2B operator. +10,000 bookings managed in Spain and Latam without external capital. Built SoundLink by validating every hypothesis with real contracts.",
         },
         {
             name: "Lucas Minetti",
             role: "Head of Product",
-            bio: isSpanish
-                ? "Diseñador gráfico y UX/UI con más de 10 años de experiencia. Especializado en productos digitales funcionales y visualmente atractivos."
-                : "Graphic designer and UX/UI specialist with over 10 years of experience. Specialized in functional and visually compelling digital products.",
-            initials: "LM",
+            photo: "/lucas.png",
+            bio: isES
+                ? "+10 años en UX/UI y diseño de productos digitales. Especialista en construir interfaces que simplifican operaciones complejas."
+                : "+10 years in UX/UI and digital product design. Specialist in building interfaces that simplify complex operations.",
         },
         {
             name: "Nik Levenberg",
-            role: "Strategic Partner — U.S.",
-            bio: isSpanish
-                ? "25 años en tecnología, startups y venture capital en el mercado estadounidense. Asesora en estructura financiera, go-to-market y fundraising."
-                : "25 years in technology, startups and venture capital in the US market. Advises on financial structure, go-to-market and fundraising.",
-            initials: "NL",
+            role: "Strategic Partner — US",
+            photo: "/nik.png",
+            bio: isES
+                ? "25 años en tecnología, startups y capital de riesgo en el mercado estadounidense. Asesora en estructura financiera, GTM global y fundraising."
+                : "25 years in technology, startups and venture capital in the US market. Advises on financial structure, global GTM and fundraising.",
         },
         {
             name: "Juan Parodi",
             role: "Strategic Partner",
-            bio: isSpanish
-                ? "Más de 20 años en desarrollo de negocios y formación ejecutiva. Mentor y asesor de emprendedores en España y Latam. Referente en sostenibilidad corporativa."
-                : "Over 20 years in business development and executive training. Mentor and advisor to entrepreneurs in Spain and Latam. Corporate sustainability reference.",
-            initials: "JP",
+            photo: "/juan.png",
+            bio: isES
+                ? "+20 años en desarrollo de negocios y formación ejecutiva. Mentor de emprendedores en España y Latam. Referente en sostenibilidad corporativa."
+                : "+20 years in business development and executive training. Mentor to entrepreneurs in Spain and Latam. Corporate sustainability reference.",
         },
         {
             name: "Ivan Novakovic",
             role: "Finance & Legal Advisor",
-            bio: isSpanish
-                ? "Abogado con especialización dual en Derecho y Economía. Experto en Fintech, Blockchain, Capital Markets y sistemas de pago digital. Speaker internacional."
-                : "Lawyer with dual specialization in Law and Economics. Expert in Fintech, Blockchain, Capital Markets and digital payment systems. International speaker.",
-            initials: "IN",
+            photo: "/ivan.png",
+            bio: isES
+                ? "Abogado especialista en Derecho y Economía. Experto en Fintech, Blockchain, Capital Markets y pagos digitales. Speaker internacional."
+                : "Lawyer specialized in Law and Economics. Expert in Fintech, Blockchain, Capital Markets and digital payments. International speaker.",
         },
         {
             name: "Graciana Virasoro",
             role: "Head Office & Accounts",
-            bio: isSpanish
-                ? "Trayectoria sólida en proyectos vinculados a venues e iniciativas musicales para empresas. Gestión end-to-end y construcción de relaciones con clientes activos."
-                : "Solid track record in venue projects and musical initiatives for companies. End-to-end management and active client relationship building.",
-            initials: "GV",
+            photo: "/graciana.png",
+            bio: isES
+                ? "Especialista en gestión end-to-end de cuentas musicales B2B. Construye y mantiene relaciones de largo plazo con clientes estratégicos."
+                : "Specialist in end-to-end management of B2B music accounts. Builds and maintains long-term relationships with strategic clients.",
         },
         {
             name: "Martín M. Foco",
             role: "Partner & Business Development",
-            bio: isSpanish
-                ? "Expertise en gestión empresarial y administración financiera. Impulsa la expansión comercial de SoundLink hacia nuevos mercados con visión cultural y financiera."
-                : "Expertise in business management and financial administration. Drives SoundLink's commercial expansion into new markets with cultural and financial vision.",
-            initials: "MF",
+            photo: "/martin.png",
+            bio: isES
+                ? "Expertise en gestión empresarial y administración financiera. Impulsa la expansión comercial hacia nuevos mercados con visión financiera y cultural."
+                : "Expertise in business management and financial administration. Drives commercial expansion into new markets with financial and cultural vision.",
         },
         {
             name: "Joaquín Lagos Aguirre",
             role: "Head of Studio",
-            bio: isSpanish
-                ? "Músico multi-instrumentista, ingeniero de sonido y productor musical con más de 20 años de experiencia. Ha participado en proyectos desde sellos independientes hasta bandas mainstream."
-                : "Multi-instrumentalist musician, sound engineer and music producer with over 20 years of experience. Has participated in projects from independent labels to mainstream bands.",
-            initials: "JL",
+            photo: "/joaquin.png",
+            bio: isES
+                ? "Músico multi-instrumentista, ingeniero de sonido y productor con +20 años de experiencia. Garantiza la calidad técnica y artística de cada ejecución."
+                : "Multi-instrumentalist musician, sound engineer and producer with +20 years of experience. Ensures the technical and artistic quality of every execution.",
         },
     ];
 
-    const usageOfFunds = [
-        { pct: 50, label: isSpanish ? "Marketing & Ventas" : "Marketing & Sales", desc: isSpanish ? "Go-to-market España + Latam, equipo comercial B2B, partnerships estratégicos" : "Spain + Latam go-to-market, B2B commercial team, strategic partnerships" },
-        { pct: 30, label: isSpanish ? "Desarrollo de Producto" : "Product Development", desc: isSpanish ? "IA, plataforma SoundBand v2, integraciones PMS/ERP, SoundPass" : "AI, SoundBand v2 platform, PMS/ERP integrations, SoundPass" },
-        { pct: 20, label: isSpanish ? "Admin & Operaciones" : "Admin & Operations", desc: isSpanish ? "Estructura legal, equipo de producción, hub físico en Canarias" : "Legal structure, production team, physical hub in Canary Islands" },
+    // ── TRACTION METRICS ───────────────────────────────────────────────────────
+    const metrics = [
+        { value: "+850K€", label: isES ? "Gestionados" : "Managed", sub: isES ? "Pagados a artistas legalmente" : "Paid to artists legally", animate: false },
+        { value: "+8.000", label: isES ? "Gigs ejecutados" : "Gigs executed", sub: isES ? "End-to-end, sin incidencias" : "End-to-end, no incidents", animate: false },
+        { value: "20%", label: isES ? "Margen neto medio" : "Average net margin", sub: isES ? "Operativo sostenido" : "Sustained operating", animate: false, accent: true },
+        { value: "0%", label: isES ? "Contingencias legales" : "Legal contingencies", sub: isES ? "En toda la historia de SoundLink" : "In SoundLink's entire history", animate: false, accent: true },
+        { value: "+2 años", label: isES ? "Retención media" : "Average retention", sub: isES ? "Clientes activos recurrentes" : "Recurring active clients", animate: false },
+        { value: "100%", label: isES ? "Compliance cubierto" : "Compliance covered", sub: isES ? "Contratos, seguros, licencias" : "Contracts, insurance, licenses", animate: false, accent: true },
     ];
 
+    // ── PROBLEMS ───────────────────────────────────────────────────────────────
+    const problems = [
+        {
+            num: "01",
+            Icon: AlertCircle,
+            title: isES ? "Desgobierno total del gasto musical" : "Total mismanagement of music spend",
+            desc: isES
+                ? "El 80% de las empresas no tienen control real sobre el ROI de su música. Las decisiones se toman por intuición, WhatsApp y correo. Ningún sistema registra qué funciona, cuánto cuesta ni por qué se elige cada artista."
+                : "80% of companies have no real control over their music ROI. Decisions are made by intuition, WhatsApp and email. No system records what works, what it costs or why each artist is chosen.",
+        },
+        {
+            num: "02",
+            Icon: Lock,
+            title: isES ? "Riesgo legal invisibilizado" : "Invisible legal risk",
+            desc: isES
+                ? "Sony v. Marriott es el caso más conocido, pero ocurre a diario. Sin contratos validados, seguros de artistas ni licencias verificadas, cada evento es un pasivo legal que la marca no ve venir."
+                : "Sony v. Marriott is the best-known case, but it happens daily. Without validated contracts, artist insurance or verified licenses, every event is a legal liability the brand doesn't see coming.",
+        },
+        {
+            num: "03",
+            Icon: RefreshCw,
+            title: isES ? "Escalabilidad imposible sin tecnología" : "Scalability impossible without technology",
+            desc: isES
+                ? "Una cadena de 50 hoteles no puede garantizar la misma calidad en el hotel 50 que en el 1 sin automatización. El modelo artesanal de agencia no escala. Se necesita infraestructura, no más coordinadores."
+                : "A chain of 50 hotels cannot guarantee the same quality in hotel 50 as in hotel 1 without automation. The artisan agency model does not scale. Infrastructure is needed, not more coordinators.",
+        },
+        {
+            num: "04",
+            Icon: Database,
+            title: isES ? "Cero trazabilidad ni datos históricos" : "Zero traceability or historical data",
+            desc: isES
+                ? "Ningún competidor ha construido una capa de datos sobre decisiones musicales B2B. No hay histórico de qué géneros generan más consumo, qué artistas retienen clientes o qué horarios maximizan la experiencia."
+                : "No competitor has built a data layer on B2B music decisions. There is no history of which genres drive more consumption, which artists retain clients or which time slots maximize experience.",
+        },
+    ];
+
+    // ── AI / AGENTIC CAPABILITIES ──────────────────────────────────────────────
+    const agentic = [
+        {
+            Icon: BrainCircuit,
+            title: isES ? "Booking Intelligence" : "Booking Intelligence",
+            desc: isES
+                ? "Motor que cruza ADN de marca, KPIs de negocio, perfil de cliente y disponibilidad de artistas para generar el match perfecto sin intervención humana en el proceso de selección."
+                : "Engine that crosses brand DNA, business KPIs, client profile and artist availability to generate the perfect match without human intervention in the selection process.",
+        },
+        {
+            Icon: Zap,
+            title: isES ? "Sustitución Agéntica en Tiempo Real" : "Agentic Substitution in Real Time",
+            desc: isES
+                ? "Ante cancelaciones o imprevistos, el sistema detecta, busca alternativa validada y reasigna talento de forma autónoma. La operación nunca se detiene."
+                : "When cancellations or unforeseen events occur, the system detects, finds a validated alternative and reassigns talent autonomously. The operation never stops.",
+        },
+        {
+            Icon: ShieldCheck,
+            title: isES ? "Compliance 360° Automatizado" : "360° Automated Compliance",
+            desc: isES
+                ? "Validación automática de contratos, seguros, licencias SGAE/BIEM y requisitos laborales. Cada contratación genera una pista de auditoría completa para el departamento legal del cliente."
+                : "Automatic validation of contracts, insurance, SGAE/BIEM licenses and labor requirements. Each booking generates a complete audit trail for the client's legal department.",
+        },
+        {
+            Icon: BarChart3,
+            title: isES ? "ROI Dashboard por Venue" : "ROI Dashboard per Venue",
+            desc: isES
+                ? "Conexión entre programación musical y métricas de negocio: ocupación, consumo, NPS, engagement. Por primera vez, el director de hotel puede justificar el gasto musical con datos."
+                : "Connection between music programming and business metrics: occupancy, consumption, NPS, engagement. For the first time, the hotel director can justify music spend with data.",
+        },
+        {
+            Icon: Cpu,
+            title: isES ? "ADN de Marca Computado" : "Computed Brand DNA",
+            desc: isES
+                ? "El sistema aprende de cada evento: qué funcionó, qué no, con qué artista y en qué contexto. Con el tiempo, las recomendaciones son más precisas que cualquier criterio editorial humano."
+                : "The system learns from each event: what worked, what didn't, with which artist and in what context. Over time, recommendations are more precise than any human editorial criterion.",
+        },
+        {
+            Icon: Activity,
+            title: isES ? "Trazabilidad Financiera Completa" : "Complete Financial Traceability",
+            desc: isES
+                ? "Una sola factura mensual cubre toda la operación: artistas, seguros, logística y gestión. El departamento de compras de una cadena hotelera accede a reporting de gasto por venue, categoría y período."
+                : "One monthly invoice covers the entire operation: artists, insurance, logistics and management. A hotel chain's procurement department accesses spend reporting by venue, category and period.",
+        },
+    ];
+
+    // ── PIPELINE ───────────────────────────────────────────────────────────────
     const pipeline = [
         {
-            icon: "🏨",
+            Icon: Target,
             title: "Hotels & Hospitality",
             mrr: "50–100K€ MRR",
             timeframe: "12–18 meses",
-            desc: isSpanish
-                ? "Segmento ya validado con +850K€. Primera fase: hoteles y resorts en Canarias, Madrid y Latam."
-                : "Segment already validated with +€850K. First phase: hotels and resorts in Canary Islands, Madrid and Latam.",
+            featured: true,
+            desc: isES
+                ? "Segmento ya validado con +850K€. Primer mercado: hoteles 4-5★ en Canarias y España. Expansión vía partners hoteleros estratégicos."
+                : "Segment already validated with +€850K. First market: 4-5★ hotels in Canary Islands and Spain. Expansion via strategic hotel partners.",
         },
         {
-            icon: "🎙️",
+            Icon: Music,
             title: "Marcas & Retail",
             mrr: "+50K€ MRR",
             timeframe: "12 meses",
-            desc: isSpanish
-                ? "Cerveceras, bancos, moda, retail. Branded gigs como herramienta de marketing on-premise."
-                : "Breweries, banks, fashion, retail. Branded gigs as on-premise marketing tool.",
+            featured: false,
+            desc: isES
+                ? "Cerveceras, bancos, moda. Branded gigs como herramienta de marketing on-premise en espacios comerciales de España y Latam."
+                : "Breweries, banks, fashion. Branded gigs as an on-premise marketing tool in commercial spaces in Spain and Latam.",
         },
         {
-            icon: "🎪",
-            title: "Promotores & Eventos",
-            mrr: "15–25K€ MRR",
-            timeframe: "18 meses",
-            desc: isSpanish
-                ? "Conciertos propios, festivales, sessions con tickets. Upselling desde base de clientes existente."
-                : "Own concerts, festivals, sessions with tickets. Upselling from existing client base.",
+            Icon: Globe,
+            title: "EU + Latam + US",
+            mrr: "Partnerships",
+            timeframe: "18–24 meses",
+            featured: false,
+            desc: isES
+                ? "Expansión a través de partners comerciales estratégicos en Europa, CALA y US. Primeras conversaciones activas en paralelo al despliegue en España."
+                : "Expansion through strategic commercial partners in Europe, CALA and US. First active conversations in parallel to Spain rollout.",
         },
         {
-            icon: "🚀",
-            title: "New Business",
-            mrr: "SoundPass",
-            timeframe: "2027",
-            desc: isSpanish
-                ? "SoundPass: plataforma de engagement para artistas y fans. En beta. Nuevas verticales y partnerships de inversión en música."
-                : "SoundPass: engagement platform for artists and fans. In beta. New verticals and music investment partnerships.",
+            Icon: Rocket,
+            title: "SoundPass & New Verticals",
+            mrr: "2027+",
+            timeframe: "36 meses",
+            featured: false,
+            desc: isES
+                ? "SoundPass: plataforma de engagement B2C en beta. Nuevas verticales: upselling de tickets, investments in music, venue management."
+                : "SoundPass: B2C engagement platform in beta. New verticals: ticket upselling, investments in music, venue management.",
+        },
+    ];
+
+    // ── USE OF FUNDS ───────────────────────────────────────────────────────────
+    const funds = [
+        {
+            pct: 50,
+            label: isES ? "Marketing & Ventas" : "Marketing & Sales",
+            desc: isES
+                ? "Go-to-market Canarias + España, equipo comercial B2B, eventos, partnerships estratégicos y apertura de mercados EU/Latam/US."
+                : "Canary Islands + Spain go-to-market, B2B commercial team, events, strategic partnerships and EU/Latam/US market opening.",
+        },
+        {
+            pct: 30,
+            label: isES ? "Desarrollo de Producto" : "Product Development",
+            desc: isES
+                ? "IA, SoundBand v2, integraciones PMS/ERP, automatización de compliance, SoundPass beta y roadmap tecnológico 2026–2027."
+                : "AI, SoundBand v2, PMS/ERP integrations, compliance automation, SoundPass beta and 2026–2027 technology roadmap.",
+        },
+        {
+            pct: 20,
+            label: isES ? "Admin & Operaciones" : "Admin & Operations",
+            desc: isES
+                ? "Estructura legal, equipo de producción y curaduría, posible apertura de hub físico en Canarias."
+                : "Legal structure, production and curation team, possible opening of physical hub in Canary Islands.",
         },
     ];
 
     return (
-        <main className="min-h-screen bg-[#020305] text-white antialiased overflow-x-hidden">
-            {/* ═══════════════════════════════════════════════════════════════
+        <div
+            className="min-h-screen bg-[#0a0f1e] text-white antialiased overflow-x-hidden"
+            style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+        >
+            {/* ─────────────────────────────────────────────────────────────────────
           NAV
-      ═══════════════════════════════════════════════════════════════ */}
-            <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#020305]/90 backdrop-blur-md">
+      ───────────────────────────────────────────────────────────────────── */}
+            <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-14 border-b border-[#1f2937]/80 bg-[#0a0f1e]/90 backdrop-blur-md">
                 <div className="flex items-center gap-3">
-                    {/* SoundLink logo — replace with real <img> */}
-                    <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                        {/* <img src="/soundlink-icono.gif" alt="SoundLink" className="w-8 h-8" /> */}
-                        <Activity className="w-4 h-4 text-blue-400" />
-                    </div>
-                    <span className="text-sm font-semibold tracking-wide">SoundLink Music</span>
+                    <img
+                        src="/soundlink-icono.gif"
+                        alt="SoundLink"
+                        className="w-7 h-7"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                    />
+                    <img
+                        src="/sl-music.png"
+                        alt="SoundLink Music"
+                        className="h-5 object-contain"
+                        onError={(e) => {
+                            const el = e.target as HTMLImageElement;
+                            el.style.display = "none";
+                            const span = document.createElement("span");
+                            span.textContent = "SoundLink Music";
+                            span.className = "text-sm font-bold text-white";
+                            el.parentNode?.appendChild(span);
+                        }}
+                    />
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-500 uppercase tracking-widest hidden sm:block">
-                        {isSpanish ? "Presentación Privada" : "Private Presentation"}
+                <div className="flex items-center gap-4">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#374151] hidden sm:block">
+                        {isES ? "Presentación Privada · No Distribuir" : "Private Presentation · Do Not Distribute"}
                     </span>
                     <Link
-                        href="mailto:nicolas@soundlink.band"
-                        className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition-colors"
+                        href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                        target="_blank"
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 transition-colors text-xs font-semibold"
                     >
-                        {isSpanish ? "Contactar" : "Contact"}
+                        <Calendar className="w-3 h-3" />
+                        {isES ? "Agendar reunión" : "Book a meeting"}
                     </Link>
                 </div>
             </nav>
 
-            {/* ═══════════════════════════════════════════════════════════════
+            {/* ─────────────────────────────────────────────────────────────────────
           HERO
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="relative pt-28 pb-20 px-6 overflow-hidden">
-                {/* Background glow */}
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-600/8 rounded-full blur-[100px]" />
-                    <div className="absolute top-20 left-1/4 w-[300px] h-[200px] bg-purple-600/5 rounded-full blur-[80px]" />
+      ───────────────────────────────────────────────────────────────────── */}
+            <section className="relative pt-32 pb-24 px-6 overflow-hidden bg-[#080d1a]">
+                {/* Atmospheric glow */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-blue-700/6 rounded-full blur-[120px]" />
+                    <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-blue-900/8 rounded-full blur-[80px]" />
                 </div>
 
-                <div className="relative max-w-5xl mx-auto text-center">
-                    {/* Logo slot */}
-                    <div className="flex items-center justify-center gap-3 mb-10">
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                            {/* <img src="/soundlink-icono.gif" alt="SoundLink" className="w-10 h-10" /> */}
-                            <Activity className="w-6 h-6 text-blue-400" />
-                        </div>
-                        <div className="text-left">
-                            <div className="text-xs text-slate-500 uppercase tracking-widest">SoundLink Music S.L.</div>
-                            <div className="text-sm font-semibold">Investor Relations 2026</div>
+                <div className="relative max-w-5xl mx-auto">
+                    {/* Header logo row */}
+                    <div className="flex items-center gap-4 mb-14">
+                        <img
+                            src="/soundlink-icono.gif"
+                            alt=""
+                            className="w-10 h-10"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                        />
+                        <div>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-[#374151] font-semibold">SoundLink Music S.L. · Islas Canarias</p>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-blue-500 font-semibold">Pre-Seed Round · 2026</p>
                         </div>
                     </div>
 
-                    <SectionLabel>
-                        <Target className="w-3 h-3" />
-                        {isSpanish ? "Pre-Seed Round" : "Pre-Seed Round"}
-                    </SectionLabel>
-
-                    <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black leading-[0.9] mb-6 tracking-tight">
-                        {isSpanish ? (
+                    {/* Hero headline */}
+                    <h1
+                        className="text-[clamp(2.8rem,7vw,5.5rem)] font-black leading-[0.95] tracking-tight text-white mb-8"
+                        style={{ letterSpacing: "-0.03em" }}
+                    >
+                        {isES ? (
                             <>
-                                La IA que convierte<br />
-                                <span className="text-blue-400">la música en vivo</span><br />
-                                en ventaja competitiva.
+                                El sistema agéntico<br />
+                                que opera tu música<br />
+                                <span className="text-blue-400">mientras tú escalas.</span>
                             </>
                         ) : (
                             <>
-                                The AI that turns<br />
-                                <span className="text-blue-400">live music</span><br />
-                                into competitive advantage.
+                                The agentic system<br />
+                                that operates your music<br />
+                                <span className="text-blue-400">while you scale.</span>
                             </>
                         )}
                     </h1>
 
-                    <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-                        {isSpanish
-                            ? "SoundLink Music opera en la intersección de gestión cultural profesional e inteligencia artificial, eliminando el caos operativo del music management B2B y generando ROI medible para hoteles, marcas y promotores a escala."
-                            : "SoundLink Music operates at the intersection of professional cultural management and artificial intelligence, eliminating operational chaos in B2B music management and generating measurable ROI for hotels, brands and promoters at scale."}
+                    <p className="text-lg md:text-xl text-[#6b7280] max-w-2xl leading-relaxed mb-14">
+                        {isES
+                            ? "SoundLink Music automatiza la gestión musical B2B de extremo a extremo — booking, compliance, contratos y ROI — eliminando el caos operativo que ninguna otra plataforma ha resuelto."
+                            : "SoundLink Music automates B2B music management end-to-end — booking, compliance, contracts and ROI — eliminating the operational chaos no other platform has solved."}
                     </p>
 
-                    {/* Investment box */}
-                    <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-sm">
-                        <div className="text-center sm:text-left sm:pr-8 sm:border-r sm:border-white/10">
-                            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500 mb-1">
-                                {isSpanish ? "Inversión buscada" : "Seeking"}
-                            </div>
-                            <div className="text-4xl font-black text-white">200.000€</div>
-                            <div className="text-sm text-blue-400 font-semibold">10% Equity · BA Round</div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-left">
-                            <div>
-                                <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                                    {isSpanish ? "Valuación post-money" : "Post-money valuation"}
-                                </div>
-                                <div className="text-lg font-black text-white">€2.000.000</div>
-                            </div>
-                            <div>
-                                <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                                    {isSpanish ? "Instrumento" : "Instrument"}
-                                </div>
-                                <div className="text-lg font-black text-white">SAFE / Equity</div>
-                            </div>
-                            <div>
-                                <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                                    {isSpanish ? "Exit proyectado" : "Projected exit"}
-                                </div>
-                                <div className="text-lg font-black text-white">hasta 9X</div>
-                            </div>
-                            <div>
-                                <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                                    {isSpanish ? "Horizonte" : "Horizon"}
-                                </div>
-                                <div className="text-lg font-black text-white">5 años</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p className="mt-6 text-xs text-slate-600">
-                        {isSpanish
-                            ? "* Inversión apalancada con créditos Sodecan, ENISA, ZEC/RIC y deducciones fiscales aplicables en Canarias — multiplicando el impacto real de tu aportación."
-                            : "* Investment leveraged with Sodecan, ENISA, ZEC/RIC credits and applicable tax deductions in the Canary Islands — multiplying the real impact of your contribution."}
-                    </p>
-                </div>
-            </section>
-
-            {/* ═══════════════════════════════════════════════════════════════
-          TRACTION METRICS
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-16 border-y border-white/[0.06] bg-white/[0.02]">
-                <div className="max-w-6xl mx-auto px-6">
-                    <p className="text-center text-[10px] uppercase tracking-[0.3em] text-slate-600 mb-8">
-                        {isSpanish ? "Tracción validada antes de levantar capital externo" : "Traction validated before raising external capital"}
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {/* Investment summary */}
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#1f2937] rounded-2xl overflow-hidden border border-[#1f2937]">
                         {[
-                            { val: "+850K€", label: isSpanish ? "Pagados a artistas" : "Paid to artists", sub: "100% legal y trazable" },
-                            { val: "+8.000", label: isSpanish ? "Gigs ejecutados" : "Gigs executed", sub: isSpanish ? "End-to-end gestionados" : "End-to-end managed" },
-                            { val: "20%", label: isSpanish ? "Margen neto medio" : "Average net margin", sub: isSpanish ? "Operativo actual" : "Current operating" },
-                            { val: "0%", label: isSpanish ? "Contingencias legales" : "Legal contingencies", sub: isSpanish ? "En toda la historia" : "In entire history" },
-                            { val: "+2 años", label: isSpanish ? "Retención de clientes" : "Client retention", sub: isSpanish ? "Media en partners clave" : "Average in key partners" },
-                            { val: "100%", label: isSpanish ? "Curaduría AI+Humana" : "AI+Human Curation", sub: isSpanish ? "En cada contratación" : "In every booking" },
-                        ].map((m, i) => (
-                            <div key={i} className="text-center p-4 rounded-xl bg-white/[0.03] border border-white/[0.07]">
-                                <div className="text-2xl font-black text-blue-400 mb-1">{m.val}</div>
-                                <div className="text-[10px] font-semibold text-white uppercase tracking-wide mb-1">{m.label}</div>
-                                <div className="text-[9px] text-slate-600">{m.sub}</div>
+                            { label: isES ? "Ask privado (BA)" : "Private ask (BA)", val: "100.000€", sub: isES ? "Business Angels" : "Business Angels" },
+                            { label: isES ? "Apalancamiento público" : "Public leverage", val: "100.000€", sub: "Sodecan + Deducciones" },
+                            { label: isES ? "Equity ofrecido" : "Equity offered", val: "10%", sub: isES ? "SAFE o Equity directo" : "SAFE or direct equity" },
+                            { label: isES ? "Runway objetivo" : "Target runway", val: "18+ meses", sub: isES ? "Hasta break-even" : "To break-even" },
+                        ].map(({ label, val, sub }, i) => (
+                            <div key={i} className="bg-[#0a0f1e] px-6 py-6">
+                                <p className="text-[10px] uppercase tracking-[0.2em] text-[#374151] font-semibold mb-2">{label}</p>
+                                <p className="text-2xl font-black text-white">{val}</p>
+                                <p className="text-xs text-[#374151] mt-1">{sub}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* ═══════════════════════════════════════════════════════════════
-          THE PROBLEM
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <SectionLabel>
-                        <Lock className="w-3 h-3" />
-                        {isSpanish ? "El Problema" : "The Problem"}
-                    </SectionLabel>
-                    <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                        {isSpanish ? "Music management B2B está roto." : "B2B music management is broken."}
-                    </h2>
-                    <p className="text-slate-400 max-w-xl mx-auto">
-                        {isSpanish
-                            ? "El mercado opera con décadas de retraso. Ninguna plataforma ha resuelto la intersección de operaciones, legal y datos a escala."
-                            : "The market operates decades behind. No platform has solved the intersection of operations, legal and data at scale."}
+            {/* ─────────────────────────────────────────────────────────────────────
+          TRACTION
+      ───────────────────────────────────────────────────────────────────── */}
+            <section className="py-16 px-6 border-y border-[#1f2937]">
+                <div className="max-w-6xl mx-auto">
+                    <p className="text-center text-[10px] uppercase tracking-[0.3em] text-[#374151] font-semibold mb-10">
+                        {isES
+                            ? "Tracción validada operativamente — sin capital externo"
+                            : "Operationally validated traction — without external capital"}
                     </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 divide-x divide-y divide-[#1f2937] border border-[#1f2937] rounded-2xl overflow-hidden">
+                        {metrics.map(({ value, label, sub, accent }, i) => (
+                            <div key={i} className="bg-[#0a0f1e] px-5 py-6 text-center">
+                                <p className={`text-2xl md:text-3xl font-black mb-1 ${accent ? "text-blue-400" : "text-white"}`}>
+                                    {value}
+                                </p>
+                                <p className="text-[9px] font-semibold uppercase tracking-widest text-[#6b7280]">{label}</p>
+                                <p className="text-[9px] text-[#374151] mt-1 hidden md:block">{sub}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+            </section>
 
-                <div className="grid md:grid-cols-2 gap-4">
+            {/* ─────────────────────────────────────────────────────────────────────
+          THE PROBLEM
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section dark>
+                <Label>{isES ? "El Problema" : "The Problem"}</Label>
+                <H2 className="mb-4">
+                    {isES ? "Music management B2B:\nroto por diseño." : "B2B music management:\nbroken by design."}
+                </H2>
+                <p className="text-[#6b7280] max-w-xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "No hay ninguna plataforma que haya resuelto la intersección de operaciones, compliance y trazabilidad de datos en música B2B. El mercado opera con décadas de retraso tecnológico."
+                        : "There is no platform that has solved the intersection of operations, compliance and data traceability in B2B music. The market operates with decades of technological delay."}
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
                     {problems.map((p, i) => (
                         <ProblemCard key={i} {...p} />
                     ))}
                 </div>
-
-                <div className="mt-8 p-5 rounded-2xl border border-blue-500/30 bg-blue-500/5 text-center">
-                    <p className="text-sm font-semibold text-blue-300">
-                        {isSpanish
-                            ? "WITH SOUNDLINK, YOUR MUSIC IS PROTECTED. AND YOUR BUSINESS, OPTIMIZED."
-                            : "WITH SOUNDLINK, YOUR MUSIC IS PROTECTED. AND YOUR BUSINESS, OPTIMIZED."}
+                <div className="mt-8 py-4 px-6 rounded-xl border border-blue-500/20 bg-blue-500/5 text-center">
+                    <p className="text-sm font-semibold text-blue-300 tracking-wide">
+                        {isES
+                            ? "WITH SOUNDLINK, YOUR MUSIC IS PROTECTED — AND YOUR OPERATIONS, AUTOMATED."
+                            : "WITH SOUNDLINK, YOUR MUSIC IS PROTECTED — AND YOUR OPERATIONS, AUTOMATED."}
                     </p>
                 </div>
-            </section>
+            </Section>
 
-            {/* ═══════════════════════════════════════════════════════════════
-          THE SOLUTION — SOUNDLINK + SOUNDBAND
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 border-y border-white/[0.06] bg-white/[0.015]">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <SectionLabel>
-                            <Layers className="w-3 h-3" />
-                            {isSpanish ? "El Ecosistema" : "The Ecosystem"}
-                        </SectionLabel>
-                        <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                            {isSpanish ? "Infraestructura, no agencia." : "Infrastructure, not an agency."}
-                        </h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">
-                            {isSpanish
-                                ? "SoundLink Music es la empresa. SoundBand es su primer producto: el sistema operativo de la música en vivo B2B. Humanos expertos potenciados por IA para eliminar fricciones y garantizar resultados."
-                                : "SoundLink Music is the company. SoundBand is its first product: the B2B live music operating system. Expert humans powered by AI to eliminate friction and guarantee results."}
+            {/* ─────────────────────────────────────────────────────────────────────
+          THE SOLUTION — SOUNDBAND
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section>
+                <Label>{isES ? "La Solución" : "The Solution"}</Label>
+                <H2 className="mb-4">
+                    {isES ? "Infraestructura agéntica.\nNo una agencia." : "Agentic infrastructure.\nNot an agency."}
+                </H2>
+                <p className="text-[#6b7280] max-w-2xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "SoundLink Music es la empresa. SoundBand es su primer producto: el sistema operativo de la música en vivo B2B. Combina un equipo especializado de gestión cultural con tecnología agéntica para eliminar fricciones y garantizar resultados a escala."
+                        : "SoundLink Music is the company. SoundBand is its first product: the B2B live music operating system. It combines a specialized cultural management team with agentic technology to eliminate friction and guarantee results at scale."}
+                </p>
+
+                {/* Products */}
+                <div className="grid md:grid-cols-2 gap-6 mb-14">
+                    {/* SoundBand */}
+                    <div className="p-8 rounded-2xl bg-[#111827] border border-[#1f2937]">
+                        <div className="h-9 mb-6">
+                            <img
+                                src="/soundband-logo.png"
+                                alt="SoundBand"
+                                className="h-full object-contain"
+                                onError={(e) => {
+                                    const el = e.target as HTMLImageElement;
+                                    el.style.display = "none";
+                                }}
+                            />
+                        </div>
+                        <p className="text-xs text-[#6b7280] leading-relaxed mb-6">
+                            {isES
+                                ? "La plataforma de gestión musical B2B para hoteles, venues y marcas. Un proveedor. Un contrato. Un pago mensual. 100% compliance desde el día 1."
+                                : "The B2B music management platform for hotels, venues and brands. One provider. One contract. One monthly payment. 100% compliance from day 1."}
                         </p>
+                        <div className="space-y-2.5">
+                            {(isES
+                                ? [
+                                    "Booking & scheduling centralizado por venue",
+                                    "Contratos, seguros y licencias gestionadas automáticamente",
+                                    "IA de matching artista–marca–contexto",
+                                    "Dashboard de ROI y métricas de impacto por evento",
+                                    "Sustitución agéntica ante cancelaciones",
+                                    "Facturación única mensual para todo el volumen",
+                                ]
+                                : [
+                                    "Centralized booking & scheduling per venue",
+                                    "Contracts, insurance and licenses managed automatically",
+                                    "Artist–brand–context AI matching",
+                                    "ROI dashboard and impact metrics per event",
+                                    "Agentic substitution for cancellations",
+                                    "Single monthly invoicing for all volume",
+                                ]
+                            ).map((item, i) => (
+                                <div key={i} className="flex items-start gap-2.5">
+                                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                                    <span className="text-xs text-[#9ca3af]">{item}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="grid lg:grid-cols-2 gap-12 items-start">
-                        {/* SoundBand Product Card */}
-                        <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-600/10 to-purple-600/5 border border-blue-500/20">
-                            {/* Logo placeholder */}
-                            <div className="h-12 mb-6 flex items-center">
-                                {/* <img src="/soundband-logo.png" alt="SoundBand" className="h-10 object-contain" /> */}
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                                        <Music className="w-4 h-4 text-blue-400" />
-                                    </div>
-                                    <span className="text-xl font-black">SoundBand</span>
-                                    <span className="text-xs text-blue-400 border border-blue-400/30 px-2 py-0.5 rounded-full">Product 1</span>
-                                </div>
+                    {/* SoundPass + model */}
+                    <div className="flex flex-col gap-4">
+                        <div className="p-6 rounded-2xl bg-[#111827] border border-[#1f2937] flex-1">
+                            <div className="h-7 mb-4">
+                                <img
+                                    src="/soundpass-logo.png"
+                                    alt="SoundPass"
+                                    className="h-full object-contain"
+                                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                />
                             </div>
-
-                            <p className="text-slate-300 text-sm leading-relaxed mb-8">
-                                {isSpanish
-                                    ? "La plataforma de gestión musical B2B para hoteles, venues y marcas. Un solo contrato. Un solo proveedor. Un solo pago mensual. 100% compliance desde el día 1."
-                                    : "The B2B music management platform for hotels, venues and brands. One contract. One provider. One monthly payment. 100% compliance from day 1."}
+                            <p className="text-[10px] text-blue-400 font-semibold uppercase tracking-widest mb-2">Beta · 2027</p>
+                            <p className="text-xs text-[#6b7280] leading-relaxed">
+                                {isES
+                                    ? "Plataforma de engagement B2C para artistas, fans y marcas. Si SoundBand es el motor de ejecución, SoundPass es el sensor de experiencia que retroalimenta al sistema agéntico."
+                                    : "B2C engagement platform for artists, fans and brands. If SoundBand is the execution engine, SoundPass is the experience sensor that feeds back into the agentic system."}
                             </p>
-
-                            <div className="space-y-1">
-                                {[
-                                    { Icon: BookmarkIcon, title: isSpanish ? "Booking & Scheduling centralizado" : "Centralized Booking & Scheduling" },
-                                    { Icon: IconCompliance, title: isSpanish ? "Contratos, seguros y compliance automático" : "Automatic contracts, insurance and compliance" },
-                                    { Icon: BrainCircuit, title: isSpanish ? "IA de matching artista–marca–contexto" : "Artist–brand–context AI matching" },
-                                    { Icon: BarChart3, title: isSpanish ? "Dashboard de ROI y métricas de impacto" : "ROI dashboard and impact metrics" },
-                                    { Icon: FileText, title: isSpanish ? "Facturación única mensual para todo el volumen" : "Single monthly invoice for all volume" },
-                                ].map(({ Icon, title }, i) => (
-                                    <div key={i} className="flex items-center gap-3 py-2.5 border-b border-white/[0.06] last:border-0">
-                                        <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                                        <span className="text-sm text-slate-300">{title}</span>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
 
-                        {/* SoundPass + Right side */}
-                        <div className="space-y-6">
-                            {/* SoundPass Card */}
-                            <div className="p-6 rounded-2xl bg-white/[0.04] border border-white/10">
-                                <div className="h-10 mb-4 flex items-center">
-                                    {/* <img src="/soundpass-logo.png" alt="SoundPass" className="h-8 object-contain" /> */}
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
-                                            <Zap className="w-3.5 h-3.5 text-purple-400" />
-                                        </div>
-                                        <span className="text-base font-bold">SoundPass</span>
-                                        <span className="text-[9px] text-purple-400 border border-purple-400/30 px-1.5 py-0.5 rounded-full">Beta</span>
-                                    </div>
-                                </div>
-                                <p className="text-xs text-slate-400 leading-relaxed">
-                                    {isSpanish
-                                        ? "Plataforma de engagement y beneficios corporativos para artistas, fans y marcas. En proceso de validación. Nueva vertical de revenue para 2027."
-                                        : "Engagement and corporate benefits platform for artists, fans and brands. In validation process. New revenue vertical for 2027."}
-                                </p>
-                            </div>
-
-                            {/* Methodology */}
-                            <div className="p-6 rounded-2xl bg-white/[0.04] border border-white/10">
-                                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide">
-                                    {isSpanish ? "El modelo híbrido: humano + IA" : "The hybrid model: human + AI"}
-                                </h3>
-                                <div className="space-y-3">
-                                    {[
-                                        { n: "01", t: isSpanish ? "Diagnóstico de ADN de marca" : "Brand DNA diagnosis" },
-                                        { n: "02", t: isSpanish ? "Matching algorítmico de artistas" : "Algorithmic artist matching" },
-                                        { n: "03", t: isSpanish ? "Ejecución + compliance automático" : "Execution + automatic compliance" },
-                                        { n: "04", t: isSpanish ? "Reporting de ROI y mejora continua" : "ROI reporting and continuous improvement" },
-                                    ].map(({ n, t: label }, i) => (
-                                        <div key={i} className="flex items-center gap-3">
-                                            <span className="text-[10px] font-mono text-blue-500 w-6 shrink-0">{n}</span>
-                                            <ChevronRight className="w-3 h-3 text-slate-600 shrink-0" />
-                                            <span className="text-xs text-slate-300">{label}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════════════════════════════════════════════════════
-          AI CAPABILITIES
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <SectionLabel>
-                        <BrainCircuit className="w-3 h-3" />
-                        {isSpanish ? "Ventaja Tecnológica" : "Technological Advantage"}
-                    </SectionLabel>
-                    <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                        {isSpanish ? "Nuestro foso: IA + experiencia operativa." : "Our moat: AI + operational expertise."}
-                    </h2>
-                    <p className="text-slate-400 max-w-2xl mx-auto">
-                        {isSpanish
-                            ? "No somos solo tecnología ni solo gestión cultural. La combinación de ambas capas es lo que ningún competidor puede replicar fácilmente."
-                            : "We are not just technology or just cultural management. The combination of both layers is what no competitor can easily replicate."}
-                    </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                    {aiCapabilities.map(({ Icon, title, desc }, i) => (
-                        <div key={i} className="p-6 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-blue-500/30 transition-all duration-300">
-                            <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5">
-                                <Icon className="w-5 h-5" />
-                            </div>
-                            <h4 className="font-bold text-base mb-2">{title}</h4>
-                            <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* ═══════════════════════════════════════════════════════════════
-          GIGS PACKS
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 border-y border-white/[0.06] bg-white/[0.015]">
-                <div className="max-w-6xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <SectionLabel>
-                            <Music className="w-3 h-3" />
-                            {isSpanish ? "Modelo de Negocio" : "Business Model"}
-                        </SectionLabel>
-                        <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                            {isSpanish ? "Branded Gigs Packs" : "Branded Gigs Packs"}
-                        </h2>
-                        <p className="text-slate-400 max-w-xl mx-auto text-sm">
-                            {isSpanish
-                                ? "Tres niveles de programación musical mensual por venue, con todo incluido: conceptualización, booking, producción, seguros y facturación única."
-                                : "Three levels of monthly music programming per venue, all included: conceptualization, booking, production, insurance and single invoice."}
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-6 mb-10">
-                        {gigsData.map((pack, i) => (
-                            <div
-                                key={i}
-                                className={`relative p-6 rounded-2xl border transition-all duration-300 ${pack.featured
-                                        ? "bg-gradient-to-b from-blue-600/15 to-blue-600/5 border-blue-500/40"
-                                        : "bg-white/[0.04] border-white/10 hover:border-white/20"
-                                    }`}
-                            >
-                                {pack.featured && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blue-600 text-[9px] font-bold uppercase tracking-widest rounded-full">
-                                        {isSpanish ? "Más solicitado" : "Most requested"}
-                                    </div>
-                                )}
-
-                                {/* Visual indicator — sessions per day */}
-                                <div className="flex gap-1.5 mb-5">
-                                    {Array.from({ length: i + 1 }).map((_, j) => (
-                                        <div key={j} className="flex-1 h-1.5 rounded-full bg-blue-500" />
-                                    ))}
-                                    {Array.from({ length: 2 - i }).map((_, j) => (
-                                        <div key={j} className="flex-1 h-1.5 rounded-full bg-white/10" />
-                                    ))}
-                                </div>
-
-                                <h3 className="text-xl font-black mb-1">{pack.label}</h3>
-                                <p className="text-blue-400 text-xs font-semibold mb-1">{pack.sessionsPerDay}</p>
-                                <p className="text-slate-500 text-xs mb-5">{pack.subtitle}</p>
-
-                                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] mb-4">
-                                    <div className="text-[10px] text-slate-500 uppercase mb-1">
-                                        {isSpanish ? "Ejemplo de uso" : "Usage example"}
-                                    </div>
-                                    <p className="text-xs text-slate-300">{pack.example}</p>
-                                </div>
-
-                                <div className="pt-4 border-t border-white/[0.06]">
-                                    <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-2">
-                                        {isSpanish ? "Estructura de precio" : "Price structure"}
-                                    </div>
-                                    <div className="text-sm font-bold text-white mb-1">{pack.price}</div>
-                                    <div className="space-y-1 text-[10px] text-slate-500">
-                                        <div>70% → Artista / Contrato</div>
-                                        <div>10% → Booking, Billing, Compliance</div>
-                                        <div className="text-blue-400 font-semibold">20% → Margen SoundLink</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] text-center">
-                        <p className="text-xs text-slate-500">
-                            {isSpanish
-                                ? "1 sesión = Solista (1 artista) · Dúo (2) · Trío (3) · Banda (+4) · DJ Set (1-2 DJs) — descuentos especiales en planes de 3, 6 y 12 meses"
-                                : "1 session = Soloist (1 artist) · Duo (2) · Trio (3) · Band (+4) · DJ Set (1-2 DJs) — special discounts on 3, 6 and 12-month plans"}
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* ═══════════════════════════════════════════════════════════════
-          MARKET OPPORTUNITY
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <SectionLabel>
-                        <Globe className="w-3 h-3" />
-                        {isSpanish ? "Mercado" : "Market"}
-                    </SectionLabel>
-                    <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                        {isSpanish
-                            ? "Dos mercados récord. Un puente único."
-                            : "Two record markets. One unique bridge."}
-                    </h2>
-                    <p className="text-slate-400 max-w-xl mx-auto">
-                        {isSpanish
-                            ? "SoundLink captura valor en la intersección de Live Music y Hospitality & Turismo — los dos sectores que más crecen en España."
-                            : "SoundLink captures value at the intersection of Live Music and Hospitality & Tourism — the two fastest-growing sectors in Spain."}
-                    </p>
-                </div>
-
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                    {marketData.map(({ val, label, icon: Icon }, i) => (
-                        <div key={i} className="p-6 rounded-2xl bg-white/[0.04] border border-white/10 text-center">
-                            <Icon className="w-6 h-6 text-blue-400 mx-auto mb-4" />
-                            <div className="text-3xl font-black text-white mb-2">{val}</div>
-                            <div className="text-xs text-slate-400">{label}</div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Spain specifics */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
-                    {[
-                        { val: "€725M", sub: isSpanish ? "Live Music España 2024 — récord histórico" : "Spanish Live Music 2024 — all-time record" },
-                        { val: "+96%", sub: isSpanish ? "Crecimiento Madrid (€185M)" : "Madrid growth (€185M)" },
-                        { val: "€4.2B", sub: isSpanish ? "Inversión hotelera proyectada" : "Projected hotel investment" },
-                        { val: "+8%", sub: isSpanish ? "Rentabilidad hotelera media" : "Average hotel profitability" },
-                    ].map(({ val, sub }, i) => (
-                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.07] text-center">
-                            <div className="text-2xl font-black text-blue-400 mb-1">{val}</div>
-                            <div className="text-[10px] text-slate-500">{sub}</div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="p-6 rounded-2xl bg-blue-500/5 border border-blue-500/20">
-                    <p className="text-center text-sm text-blue-300 font-medium">
-                        {isSpanish
-                            ? "SoundLink es el puente tecnológico que captura valor en la intersección de dos mercados récord: Live Music ($91B global) + Hospitality España (97M visitantes, 13.5% PIB)."
-                            : "SoundLink is the technological bridge that captures value at the intersection of two record markets: Live Music ($91B global) + Spain Hospitality (97M visitors, 13.5% GDP)."}
-                    </p>
-                </div>
-            </section>
-
-            {/* ═══════════════════════════════════════════════════════════════
-          PIPELINE 2026/2027
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 border-y border-white/[0.06] bg-white/[0.015]">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <SectionLabel>
-                            <Rocket className="w-3 h-3" />
-                            {isSpanish ? "Roadmap & Pipeline" : "Roadmap & Pipeline"}
-                        </SectionLabel>
-                        <h2 className="text-4xl lg:text-5xl font-black">
-                            SoundLink Pipeline 2026–2027
-                        </h2>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
-                        {pipeline.map(({ title, mrr, timeframe, desc }, i) => (
-                            <div key={i} className="p-6 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-blue-500/20 transition-all duration-300">
-                                <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5">
-                                    {i === 0 ? <Building2 className="w-5 h-5" /> : i === 1 ? <Target className="w-5 h-5" /> : i === 2 ? <Music className="w-5 h-5" /> : <Rocket className="w-5 h-5" />}
-                                </div>
-                                <h4 className="font-bold text-sm mb-1 uppercase tracking-wide">{title}</h4>
-                                <div className="text-blue-400 text-xs font-semibold mb-0.5">{mrr}</div>
-                                <div className="text-slate-600 text-[10px] mb-3">{timeframe}</div>
-                                <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Revenue projections */}
-                    <div className="rounded-2xl overflow-hidden border border-white/10">
-                        <div className="p-4 bg-white/[0.04] border-b border-white/[0.06]">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">
-                                {isSpanish ? "Proyección de Revenue — 5 años" : "Revenue Projection — 5 years"}
-                            </h3>
-                        </div>
-                        <div className="divide-y divide-white/[0.06]">
-                            {revenueProjections.map(({ timeframe, mrr, mix, focus, featured }, i) => (
-                                <div
-                                    key={i}
-                                    className={`grid grid-cols-3 gap-4 p-5 items-center ${featured ? "bg-blue-600/5" : ""}`}
-                                >
-                                    <div>
-                                        <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-1">
-                                            {isSpanish ? "Plazo" : "Timeframe"}
-                                        </div>
-                                        <div className="text-sm font-semibold">{timeframe}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-1">MRR / ARR</div>
-                                        <div className={`text-lg font-black ${featured ? "text-blue-400" : "text-white"}`}>{mrr}</div>
-                                        <div className="text-[10px] text-slate-500">{mix}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[10px] text-slate-500 uppercase tracking-wide mb-1">Focus</div>
-                                        <div className="text-xs text-slate-300">{focus}</div>
-                                    </div>
+                        {/* Zero-Touch Model */}
+                        <div className="p-6 rounded-2xl bg-[#111827] border border-[#1f2937]">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#374151] mb-4">
+                                {isES ? "Modelo Zero-Touch" : "Zero-Touch Model"}
+                            </p>
+                            {(isES
+                                ? [
+                                    { n: "Input", t: "Cliente define presupuesto y objetivos de marca" },
+                                    { n: "Process", t: "IA selecciona, contrata, asegura y calendariza" },
+                                    { n: "Output", t: "Ejecución llave en mano con trazabilidad total" },
+                                    { n: "Loop", t: "Sistema aprende y optimiza en cada evento" },
+                                ]
+                                : [
+                                    { n: "Input", t: "Client defines budget and brand objectives" },
+                                    { n: "Process", t: "AI selects, books, insures and schedules" },
+                                    { n: "Output", t: "Turnkey execution with full traceability" },
+                                    { n: "Loop", t: "System learns and optimizes with each event" },
+                                ]
+                            ).map(({ n, t }, i) => (
+                                <div key={i} className="flex items-start gap-3 mb-3 last:mb-0">
+                                    <span className="text-[9px] font-mono font-bold text-blue-500 uppercase tracking-wider w-12 pt-0.5 shrink-0">
+                                        {n}
+                                    </span>
+                                    <span className="text-xs text-[#6b7280]">{t}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
-            </section>
 
-            {/* ═══════════════════════════════════════════════════════════════
-          TEAM
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
-                    <SectionLabel>
-                        <Users className="w-3 h-3" />
-                        {isSpanish ? "El Equipo" : "The Team"}
-                    </SectionLabel>
-                    <h2 className="text-4xl lg:text-5xl font-black mb-4">
-                        {isSpanish ? "Expertos que ya ejecutaron." : "Experts who already executed."}
-                    </h2>
-                    <p className="text-slate-400 max-w-xl mx-auto">
-                        {isSpanish
-                            ? "No es un equipo de primera empresa. Detrás de SoundLink hay años de operaciones reales, red consolidada y expertise multidisciplinar."
-                            : "This is not a first-time team. Behind SoundLink are years of real operations, consolidated network and multidisciplinary expertise."}
+                {/* Gigs Packs */}
+                <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#374151] mb-6">
+                        {isES ? "Estructura de producto — Branded Gigs Packs" : "Product structure — Branded Gigs Packs"}
+                    </p>
+                    <div className="grid md:grid-cols-3 gap-4 mb-4">
+                        {[
+                            {
+                                name: "Gigs 1",
+                                sessions: isES ? "1 sesión / día / venue" : "1 session / day / venue",
+                                example: isES ? "Lobby hotel 4★ — cuarteto de jazz, viernes y sábados" : "4★ hotel lobby — jazz quartet, Fridays and Saturdays",
+                            },
+                            {
+                                name: "Gigs 2",
+                                sessions: isES ? "2 sesiones / día / venue" : "2 sessions / day / venue",
+                                example: isES ? "Resort 5★ — brunch acústico + cena con DJs" : "5★ resort — acoustic brunch + dinner with DJs",
+                                featured: true,
+                            },
+                            {
+                                name: "Gigs 3",
+                                sessions: isES ? "3 sesiones / día / venue" : "3 sessions / day / venue",
+                                example: isES ? "Gran Hotel — pool bar + welcome + gala event" : "Grand Hotel — pool bar + welcome + gala event",
+                            },
+                        ].map(({ name, sessions, example, featured }, i) => (
+                            <div
+                                key={i}
+                                className={`p-5 rounded-xl border ${featured
+                                    ? "bg-blue-600/10 border-blue-500/40"
+                                    : "bg-[#111827] border-[#1f2937]"
+                                    }`}
+                            >
+                                {/* Sessions bar */}
+                                <div className="flex gap-1 mb-4">
+                                    {Array.from({ length: 3 }).map((_, j) => (
+                                        <div
+                                            key={j}
+                                            className={`h-1 flex-1 rounded-full ${j <= i ? "bg-blue-500" : "bg-[#1f2937]"
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                                <p className="font-black text-sm text-white mb-0.5">{name}</p>
+                                <p className="text-[11px] text-blue-400 font-semibold mb-3">{sessions}</p>
+                                <p className="text-[11px] text-[#6b7280] leading-relaxed">{example}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-px bg-[#1f2937] rounded-xl overflow-hidden border border-[#1f2937]">
+                        {[
+                            { pct: "70%", label: isES ? "Artista / Contrato" : "Artist / Contract" },
+                            { pct: "10%", label: isES ? "Booking · Billing · Compliance" : "Booking · Billing · Compliance" },
+                            { pct: "20%", label: isES ? "Margen SoundLink" : "SoundLink Margin", accent: true },
+                        ].map(({ pct, label, accent }, i) => (
+                            <div key={i} className="bg-[#0a0f1e] px-5 py-4 text-center">
+                                <p className={`text-xl font-black ${accent ? "text-blue-400" : "text-white"}`}>{pct}</p>
+                                <p className="text-[10px] text-[#374151] uppercase tracking-wide mt-1">{label}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <p className="text-[10px] text-[#374151] text-center mt-3">
+                        {isES
+                            ? "1 Gig = mín. 190€ / artista · 1 Sesión = Solista · Dúo · Trío · Banda (+4) · DJ Set"
+                            : "1 Gig = min. €190 / artist · 1 Session = Soloist · Duo · Trio · Band (+4) · DJ Set"}
                     </p>
                 </div>
+            </Section>
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {team.map((member, i) => (
-                        <TeamMember key={i} {...member} />
+            {/* ─────────────────────────────────────────────────────────────────────
+          AI / AGENTIC ADVANTAGE
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section dark>
+                <Label>{isES ? "Ventaja Tecnológica" : "Technological Advantage"}</Label>
+                <H2 className="mb-4">
+                    {isES ? "El foso: IA + expertise\noperativo real." : "The moat: AI + real\noperational expertise."}
+                </H2>
+                <p className="text-[#6b7280] max-w-xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "No somos una agencia con software ni un marketplace de artistas. Somos infraestructura agéntica especializada que ningún competidor puede replicar sin años de datos y operaciones reales."
+                        : "We are not an agency with software or an artist marketplace. We are specialized agentic infrastructure that no competitor can replicate without years of real data and operations."}
+                </p>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {agentic.map(({ Icon, title, desc }, i) => (
+                        <div
+                            key={i}
+                            className="p-6 rounded-2xl bg-[#0a0f1e] border border-[#1f2937] hover:border-blue-500/30 transition-colors duration-300"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
+                                <Icon className="w-5 h-5" />
+                            </div>
+                            <h4 className="font-bold text-sm text-white mb-2">{title}</h4>
+                            <p className="text-xs text-[#6b7280] leading-relaxed">{desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </Section>
+
+            {/* ─────────────────────────────────────────────────────────────────────
+          MARKET
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section>
+                <Label>{isES ? "Oportunidad de Mercado" : "Market Opportunity"}</Label>
+                <H2 className="mb-4">
+                    {isES ? "Dos mercados récord.\nUn puente único." : "Two record markets.\nOne unique bridge."}
+                </H2>
+                <p className="text-[#6b7280] max-w-xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "SoundLink opera en la intersección de Live Music global y Hospitality & Turismo en España — los dos sectores con mayor crecimiento simultáneo."
+                        : "SoundLink operates at the intersection of global Live Music and Spain's Hospitality & Tourism — the two sectors with the highest simultaneous growth."}
+                </p>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#1f2937] rounded-2xl overflow-hidden border border-[#1f2937] mb-6">
+                    {[
+                        { val: "$38.2B", label: "Live Music Global 2025" },
+                        { val: "$91.4B", label: "Music Tourism Global 2024" },
+                        { val: "€725M", label: isES ? "Live Music España 2024" : "Spanish Live Music 2024" },
+                        { val: "97M", label: isES ? "Turistas España 2025" : "Spain Tourists 2025" },
+                    ].map(({ val, label }, i) => (
+                        <div key={i} className="bg-[#0a0f1e] px-6 py-8 text-center">
+                            <p className="text-3xl md:text-4xl font-black text-blue-400 mb-2">{val}</p>
+                            <p className="text-[10px] text-[#6b7280] uppercase tracking-wide">{label}</p>
+                        </div>
                     ))}
                 </div>
 
-                <p className="text-center text-xs text-slate-600 mt-6">
-                    {isSpanish
-                        ? "* Para agregar la foto de cada miembro: reemplaza el comentario en TeamMember con <img src=\"/team/nombre.jpg\" />"
-                        : "* To add each member's photo: replace the comment in TeamMember with <img src=\"/team/name.jpg\" />"}
-                </p>
-            </section>
+                <div className="grid sm:grid-cols-4 gap-3">
+                    {[
+                        { val: "+96%", sub: isES ? "Crecimiento Live Music Madrid (€185M)" : "Madrid Live Music growth (€185M)" },
+                        { val: "€4.2B", sub: isES ? "Inversión hotelera proyectada España" : "Projected hotel investment Spain" },
+                        { val: "+8%", sub: isES ? "Rentabilidad hotelera media España" : "Average hotel profitability Spain" },
+                        { val: "13.5%", sub: isES ? "Contribución turismo al PIB España" : "Tourism contribution to Spain GDP" },
+                    ].map(({ val, sub }, i) => (
+                        <div key={i} className="p-4 rounded-xl bg-[#111827] border border-[#1f2937] text-center">
+                            <p className="text-xl font-black text-white mb-1">{val}</p>
+                            <p className="text-[10px] text-[#374151]">{sub}</p>
+                        </div>
+                    ))}
+                </div>
+            </Section>
 
-            {/* ═══════════════════════════════════════════════════════════════
-          INVESTMENT TERMS & USE OF FUNDS
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 border-y border-white/[0.06] bg-white/[0.015]">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <SectionLabel>
-                            <TrendingUp className="w-3 h-3" />
-                            {isSpanish ? "La Inversión" : "The Investment"}
-                        </SectionLabel>
-                        <h2 className="text-4xl lg:text-5xl font-black">
-                            {isSpanish ? "200K€ con apalancamiento institucional." : "€200K with institutional leverage."}
-                        </h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto mt-4 text-sm">
-                            {isSpanish
-                                ? "Parte de esta inversión será apalancada a través de créditos Sodecan, ENISA, ZEC/RIC y deducciones fiscales aplicables en Canarias, multiplicando el impacto real de cada euro invertido."
-                                : "Part of this investment will be leveraged through Sodecan, ENISA, ZEC/RIC credits and applicable tax deductions in the Canary Islands, multiplying the real impact of each euro invested."}
+            {/* ─────────────────────────────────────────────────────────────────────
+          PIPELINE & REVENUE
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section dark>
+                <Label>{isES ? "Roadmap & Pipeline" : "Roadmap & Pipeline"}</Label>
+                <H2 className="mb-4">SoundLink Pipeline 2026–2027</H2>
+                <p className="text-[#6b7280] max-w-xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "Objetivo mínimo: 50K€ MRR sostenido en 18 meses. Target: 150K€ MRR en 24 meses. La inversión está enfocada en alcanzar break-even antes de la siguiente ronda."
+                        : "Minimum objective: €50K MRR sustained at 18 months. Target: €150K MRR at 24 months. The investment is focused on reaching break-even before the next round."}
+                </p>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+                    {pipeline.map((p, i) => (
+                        <PipelineCard key={i} {...p} />
+                    ))}
+                </div>
+
+                {/* Revenue projection table */}
+                <div className="rounded-2xl overflow-hidden border border-[#1f2937]">
+                    <div className="bg-[#111827] px-6 py-3 border-b border-[#1f2937]">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#374151]">
+                            {isES ? "Proyección de Revenue — 5 años" : "Revenue Projection — 5 years"}
                         </p>
                     </div>
-
-                    <div className="grid lg:grid-cols-2 gap-12">
-                        {/* Terms */}
-                        <div className="p-8 rounded-2xl bg-gradient-to-b from-blue-600/10 to-transparent border border-blue-500/20">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">
-                                {isSpanish ? "Condiciones de la ronda" : "Round terms"}
-                            </h3>
-                            <div className="space-y-4">
-                                {[
-                                    { label: isSpanish ? "Inversión buscada" : "Seeking", val: "200.000€", highlight: true },
-                                    { label: isSpanish ? "Tipo de inversor" : "Investor type", val: "Business Angel" },
-                                    { label: isSpanish ? "Instrumento" : "Instrument", val: "SAFE o Equity" },
-                                    { label: isSpanish ? "Equity ofrecido" : "Equity offered", val: "10%" },
-                                    { label: isSpanish ? "Valuación post-money" : "Post-money valuation", val: "€2.000.000" },
-                                    { label: isSpanish ? "Exit proyectado (5 años)" : "Projected exit (5 years)", val: "hasta 9X" },
-                                    { label: isSpanish ? "Apalancamiento disponible" : "Available leverage", val: "ENISA + Sodecan + ZEC" },
-                                ].map(({ label, val, highlight }, i) => (
-                                    <div key={i} className="flex justify-between items-center py-3 border-b border-white/[0.06] last:border-0">
-                                        <span className="text-sm text-slate-400">{label}</span>
-                                        <span className={`font-bold text-sm ${highlight ? "text-blue-400 text-lg" : "text-white"}`}>{val}</span>
-                                    </div>
-                                ))}
+                    {[
+                        {
+                            time: "6–12 meses",
+                            mrr: "50K – 150K€ MRR",
+                            mix: "75% España + 25% Latam",
+                            note: isES ? "Hotels & Hospitality · Canarias + Madrid" : "Hotels & Hospitality · Canary Islands + Madrid",
+                        },
+                        {
+                            time: "12–24 meses",
+                            mrr: "150K – 350K€ MRR",
+                            mix: "60% España + 40% Latam",
+                            note: isES ? "Hotels + Marcas + Promotores · Expansión EU" : "Hotels + Brands + Promoters · EU Expansion",
+                            featured: true,
+                        },
+                        {
+                            time: "36–60 meses",
+                            mrr: "+10M ARR",
+                            mix: "50% EU + 25% Latam + 25% US",
+                            note: isES ? "Integración PMS/ERP global · SoundPass live" : "Global PMS/ERP integration · SoundPass live",
+                        },
+                    ].map(({ time, mrr, mix, note, featured }, i) => (
+                        <div
+                            key={i}
+                            className={`grid grid-cols-3 gap-6 px-6 py-5 border-b border-[#1f2937] last:border-0 ${featured ? "bg-blue-600/5" : "bg-[#0a0f1e]"
+                                }`}
+                        >
+                            <div>
+                                <p className="text-[10px] text-[#374151] uppercase tracking-wide mb-1">
+                                    {isES ? "Plazo" : "Timeline"}
+                                </p>
+                                <p className="text-sm font-semibold text-white">{time}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-[#374151] uppercase tracking-wide mb-1">MRR / ARR</p>
+                                <p className={`text-base font-black ${featured ? "text-blue-400" : "text-white"}`}>
+                                    {mrr}
+                                </p>
+                                <p className="text-[10px] text-[#374151]">{mix}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] text-[#374151] uppercase tracking-wide mb-1">Focus</p>
+                                <p className="text-xs text-[#6b7280]">{note}</p>
                             </div>
                         </div>
+                    ))}
+                </div>
+            </Section>
 
-                        {/* Use of funds */}
-                        <div>
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6">
-                                {isSpanish ? "Uso de fondos" : "Use of funds"}
-                            </h3>
-                            <div className="space-y-4">
-                                {usageOfFunds.map(({ pct, label, desc }, i) => (
-                                    <div key={i} className="p-5 rounded-xl bg-white/[0.04] border border-white/10">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="font-bold text-sm">{label}</span>
-                                            <span className="text-2xl font-black text-blue-400">{pct}%</span>
-                                        </div>
-                                        {/* Progress bar */}
-                                        <div className="h-1.5 bg-white/10 rounded-full mb-3 overflow-hidden">
-                                            <div
-                                                className="h-full bg-blue-500 rounded-full"
-                                                style={{ width: `${pct}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500">{desc}</p>
+            {/* ─────────────────────────────────────────────────────────────────────
+          TEAM
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section>
+                <Label>{isES ? "El Equipo" : "The Team"}</Label>
+                <H2 className="mb-4">
+                    {isES ? "Operadores, no\nteóricos." : "Operators, not\ntheorists."}
+                </H2>
+                <p className="text-[#6b7280] max-w-xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "Detrás de SoundLink hay años de operaciones reales, contratos ejecutados y una red consolidada en hospitality, tech y mercados internacionales."
+                        : "Behind SoundLink are years of real operations, executed contracts and a consolidated network in hospitality, tech and international markets."}
+                </p>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {team.map((m, i) => (
+                        <TeamCard key={i} {...m} />
+                    ))}
+                </div>
+            </Section>
+
+            {/* ─────────────────────────────────────────────────────────────────────
+          INVESTMENT TERMS
+      ───────────────────────────────────────────────────────────────────── */}
+            <Section dark>
+                <Label>{isES ? "La Inversión" : "The Investment"}</Label>
+                <H2 className="mb-4">
+                    {isES
+                        ? "200K€. 18 meses.\nBreak-even."
+                        : "€200K. 18 months.\nBreak-even."}
+                </H2>
+                <p className="text-[#6b7280] max-w-2xl mb-14 text-base leading-relaxed">
+                    {isES
+                        ? "Buscamos 100K€ de Business Angels al 10% de equity. Los 100K€ restantes provienen de apalancamiento público (Sodecan, deducciones fiscales Canarias, posible Tax Lease) — sin dilución adicional."
+                        : "We seek €100K from Business Angels at 10% equity. The remaining €100K comes from public leverage (Sodecan, Canary Islands tax deductions, possible Tax Lease) — no additional dilution."}
+                </p>
+
+                <div className="grid lg:grid-cols-2 gap-8">
+                    {/* Terms */}
+                    <div className="rounded-2xl overflow-hidden border border-[#1f2937]">
+                        <div className="bg-[#111827] px-6 py-4 border-b border-[#1f2937]">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#374151]">
+                                {isES ? "Condiciones de la ronda" : "Round terms"}
+                            </p>
+                        </div>
+                        <div className="divide-y divide-[#1f2937]">
+                            {[
+                                { label: isES ? "Ask privado (Business Angels)" : "Private ask (Business Angels)", val: "100.000€", accent: true },
+                                { label: isES ? "Equity ofrecido" : "Equity offered", val: "10%" },
+                                { label: isES ? "Instrumento" : "Instrument", val: "SAFE o Equity" },
+                                { label: isES ? "Valuación post-money" : "Post-money valuation", val: "1.000.000€" },
+                                { label: isES ? "Apalancamiento público" : "Public leverage", val: "100.000€" },
+                                { label: isES ? "Instrumentos de apalancamiento" : "Leverage instruments", val: "Sodecan + Deducciones + Tax Lease" },
+                                { label: isES ? "Total capital operativo" : "Total operating capital", val: "200.000€" },
+                                { label: isES ? "Exit proyectado (5 años)" : "Projected exit (5 years)", val: "hasta 9X", accent: true },
+                            ].map(({ label, val, accent }, i) => (
+                                <div key={i} className="flex justify-between items-center px-6 py-4 bg-[#0a0f1e]">
+                                    <span className="text-xs text-[#6b7280]">{label}</span>
+                                    <span className={`text-sm font-bold ${accent ? "text-blue-400" : "text-white"}`}>
+                                        {val}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Use of funds */}
+                    <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#374151] mb-6">
+                            {isES ? "Uso de fondos (200K€)" : "Use of funds (€200K)"}
+                        </p>
+                        <div className="space-y-4">
+                            {funds.map(({ pct, label, desc }, i) => (
+                                <div key={i} className="p-5 rounded-xl bg-[#111827] border border-[#1f2937]">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <p className="font-bold text-sm text-white">{label}</p>
+                                        <p className="text-2xl font-black text-blue-400">{pct}%</p>
                                     </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.07]">
-                                <p className="text-xs text-slate-500 leading-relaxed">
-                                    {isSpanish
-                                        ? "El resto del presupuesto operativo se generará mediante apalancamiento financiero: créditos blandos ENISA, Sodecan ZEC/RIC, deducciones I+D+i y apoyo de instituciones canarias."
-                                        : "The rest of the operating budget will be generated through financial leverage: ENISA soft loans, Sodecan ZEC/RIC credits, R&D tax deductions and Canarian institutional support."}
-                                </p>
-                            </div>
+                                    <div className="h-1 bg-[#1f2937] rounded-full mb-3 overflow-hidden">
+                                        <div
+                                            className="h-full bg-blue-500 rounded-full"
+                                            style={{ width: `${pct}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-[#374151]">{desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 p-4 rounded-xl border border-[#1f2937] bg-[#0a0f1e]/50">
+                            <p className="text-[11px] text-[#374151] leading-relaxed">
+                                {isES
+                                    ? "El apalancamiento público (Sodecan, deducciones I+D y posible Tax Lease en Canarias) multiplica el impacto de cada euro privado sin dilución adicional de equity."
+                                    : "Public leverage (Sodecan, R&D deductions and possible Tax Lease in Canary Islands) multiplies the impact of each private euro without additional equity dilution."}
+                            </p>
                         </div>
                     </div>
                 </div>
-            </section>
+            </Section>
 
-            {/* ═══════════════════════════════════════════════════════════════
+            {/* ─────────────────────────────────────────────────────────────────────
           CTA
-      ═══════════════════════════════════════════════════════════════ */}
-            <section className="py-28 max-w-4xl mx-auto px-6 text-center">
-                <h2 className="text-5xl lg:text-6xl font-black mb-6">
-                    {isSpanish ? "Únete a la Banda." : "Join the Band."}
-                </h2>
-                <p className="text-slate-400 text-lg max-w-xl mx-auto mb-12 leading-relaxed">
-                    {isSpanish
-                        ? "Estamos construyendo el estándar de la música B2B en España y Latam. Si crees en el poder de la música como herramienta de negocio, hablemos."
-                        : "We are building the B2B music standard in Spain and Latam. If you believe in the power of music as a business tool, let's talk."}
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-                    <Link
-                        href="mailto:nicolas@soundlink.band"
-                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black rounded-full font-bold hover:bg-blue-500 hover:text-white transition-all shadow-xl text-sm"
+      ───────────────────────────────────────────────────────────────────── */}
+            <section className="py-28 px-6 bg-[#0a0f1e] text-center">
+                <div className="max-w-2xl mx-auto">
+                    <img
+                        src="/soundlink-icono.gif"
+                        alt=""
+                        className="w-12 h-12 mx-auto mb-8"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <h2
+                        className="text-5xl md:text-6xl font-black text-white mb-6 leading-tight"
+                        style={{ letterSpacing: "-0.03em" }}
                     >
-                        <Mail className="w-4 h-4" />
-                        nicolas@soundlink.band
-                    </Link>
-                    <Link
-                        href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white rounded-full font-semibold hover:border-blue-400 hover:text-blue-400 transition-all text-sm"
-                    >
-                        <Calendar className="w-4 h-4" />
-                        {isSpanish ? "Agenda una reunión" : "Schedule a meeting"}
-                    </Link>
-                </div>
+                        {isES ? "Únete a la Banda." : "Join the Band."}
+                    </h2>
+                    <p className="text-[#6b7280] text-lg mb-12 max-w-md mx-auto leading-relaxed">
+                        {isES
+                            ? "Estamos construyendo el estándar de la música B2B en España y Latam. Si crees que la música puede ser un sistema operativo para marcas, hablemos."
+                            : "We are building the B2B music standard in Spain and Latam. If you believe music can be an operating system for brands, let's talk."}
+                    </p>
 
-                <div className="flex items-center justify-center gap-6 text-xs text-slate-600">
-                    <span>Nicolás A. Civatti · Founder & CEO</span>
-                    <span>·</span>
-                    <span>SoundLink Music S.L.</span>
-                    <span>·</span>
-                    <span>Islas Canarias, España</span>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center mb-14">
+                        <Link
+                            href="mailto:nicolas@soundlink.band"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-blue-500 hover:text-white transition-all text-sm"
+                        >
+                            <Mail className="w-4 h-4" />
+                            nicolas@soundlink.band
+                        </Link>
+                        <Link
+                            href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                            target="_blank"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#1f2937] text-white font-semibold rounded-full hover:border-blue-500/50 transition-all text-sm"
+                        >
+                            <Calendar className="w-4 h-4" />
+                            {isES ? "Agendar reunión" : "Schedule a meeting"}
+                        </Link>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-[#374151]">
+                        <span>Nicolás A. Civatti · Founder & CEO</span>
+                        <span>·</span>
+                        <span>SoundLink Music S.L.</span>
+                        <span>·</span>
+                        <span>Islas Canarias, España</span>
+                        <span>·</span>
+                        <Link href="https://www.soundband.pro" target="_blank" className="hover:text-blue-400 transition-colors">
+                            soundband.pro
+                        </Link>
+                    </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <div className="border-t border-white/[0.06] py-6 px-6">
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-slate-700">
-                    <span>© 2026 SoundLink Music S.L. · Todos los derechos reservados</span>
-                    <span>{isSpanish ? "Presentación privada · No distribuir" : "Private presentation · Do not distribute"}</span>
-                    <span>
-                        {isSpanish ? "Powered by " : "Powered by "}
-                        <Link href="https://www.doyo.pro/?lang=es" target="_blank" className="text-slate-600 hover:text-slate-400">
-                            DOYO.PRO
-                        </Link>
-                    </span>
+            <footer className="border-t border-[#1f2937] py-5 px-6">
+                <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-[#374151]">
+                    <span>© 2026 SoundLink Music S.L.</span>
+                    <span>{isES ? "Presentación privada · No distribuir" : "Private presentation · Do not distribute"}</span>
+                    <Link href="https://doyo.pro" target="_blank" className="hover:text-[#6b7280] transition-colors">
+                        Powered by DOYO.PRO
+                    </Link>
                 </div>
-            </div>
-        </main>
-    );
-}
-
-// Helper — placeholder icon used inline (to avoid passing string icon names)
-function BookmarkIcon({ className }: { className: string }) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
-            <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-        </svg>
-    );
-}
-
-function Building2({ className }: { className: string }) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
-            <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4M10 10h4M10 14h4M10 18h4" />
-        </svg>
+            </footer>
+        </div>
     );
 }
