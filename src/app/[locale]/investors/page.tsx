@@ -546,7 +546,7 @@ export default function InvestorsPageV4() {
                         {isES ? "Presentación Privada · No Distribuir" : "Private Presentation · Do Not Distribute"}
                     </span>
                     <Link
-                        href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                        href="https://calendar.app.google/Q16M9dC7ftEJdLsx5"
                         target="_blank"
                         className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 transition-colors text-xs font-semibold"
                     >
@@ -1123,14 +1123,14 @@ export default function InvestorsPageV4() {
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center mb-14">
                         <Link
-                            href="mailto:nicolas@soundlink.band"
+                            href="mailto:nicolas.doyopro@gmail.com"
                             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-blue-500 hover:text-white transition-all text-sm"
                         >
                             <Mail className="w-4 h-4" />
-                            nicolas@soundlink.band
+                            nicolas.doyopro@gmail.com
                         </Link>
                         <Link
-                            href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                            href="https://calendar.app.google/Q16M9dC7ftEJdLsx5"
                             target="_blank"
                             className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#1f2937] text-white font-semibold rounded-full hover:border-blue-500/50 transition-all text-sm"
                         >

@@ -131,7 +131,7 @@ const dict = {
       title2: "en la industria musical.",
       desc: "Analizamos tu infraestructura actual e implementamos la capa de software que optimiza procesos, minimiza riesgos y genera ROI medible.",
       btn: "Agendar Consultoría Estratégica",
-      contact: "nicolas@soundlink.band"
+      contact: "nicolas.doyopro@gmail.com"
     },
     footer: {
       text: "Compañía tecnológica de infraestructura musical B2B. Innovación en software, IA y gestión de talento.",
@@ -258,7 +258,7 @@ const dict = {
       title2: "in the music industry.",
       desc: "We analyze your current infrastructure and implement the software layer that optimizes processes, minimizes risks, and generates measurable ROI.",
       btn: "Book Strategic Consulting",
-      contact: "nicolas@soundlink.band"
+      contact: "nicolas.doyopro@gmail.com"
     },
     footer: {
       text: "B2B music infrastructure technology company. Innovation in software, AI, and talent management.",
@@ -411,7 +411,7 @@ export default function SoundLinkCorporate() {
                 </button>
               ))}
             </div>
-            <Link href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9" target="_blank"
+            <Link href="https://calendar.app.google/Q16M9dC7ftEJdLsx5" target="_blank"
               className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-widest rounded-full hover:bg-[#0066CC] transition-colors shadow-sm">
               {t.nav.demo}
             </Link>
@@ -661,7 +661,7 @@ export default function SoundLinkCorporate() {
               <p className="text-base text-slate-500 leading-relaxed font-medium mb-10 max-w-lg">
                 {t.market.insight}
               </p>
-              <Link href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9" target="_blank"
+              <Link href="https://calendar.app.google/Q16M9dC7ftEJdLsx5" target="_blank"
                 className="inline-flex items-center gap-2 text-slate-900 font-bold text-sm hover:text-[#0066CC] transition-colors uppercase tracking-wider">
                 Analizar tu oportunidad <ArrowRight className="w-4 h-4" />
               </Link>
@@ -757,7 +757,7 @@ export default function SoundLinkCorporate() {
                   {t.cta.desc}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <Link href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9" target="_blank"
+                  <Link href="https://calendar.app.google/Q16M9dC7ftEJdLsx5" target="_blank"
                     className="flex items-center gap-2 px-10 py-5 bg-[#0066CC] text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors shadow-lg">
                     {t.cta.btn} <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -812,8 +812,8 @@ export default function SoundLinkCorporate() {
                 },
                 {
                   title: "Contacto", links: [
-                    ["nicolas@soundlink.band", "mailto:nicolas@soundlink.band"],
-                    ["Agendar Reunión →", "https://calendar.app.google/mpwxXhzTB7xB5Tfx9"]
+                    ["nicolas.doyopro@gmail.com", "mailto:nicolas.doyopro@gmail.com"],
+                    ["Agendar Reunión →", "https://calendar.app.google/Q16M9dC7ftEJdLsx5"]
                   ]
                 }
               ].map(({ title, links }) => (
