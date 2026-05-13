@@ -144,6 +144,28 @@ export default function InvestorDeckV7() {
 
     return (
         <div className="min-h-screen bg-[#0f0f0f] text-white antialiased overflow-x-hidden font-sans">
+            {/* Meta tags for Open Graph */}
+            <meta property="og:title" content="SoundLink Music | Investor Deck" />
+            <meta property="og:description" content={isES 
+              ? "Las empresas gastan millones en música. Nosotros medimos si funciona. €100K Pre-Seed 2026."
+              : "Companies spend millions on music. We measure if it works. €100K Pre-Seed 2026."} />
+            <meta property="og:image" content="https://soundlink.band/portada.png" />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="og:image:type" content="image/png" />
+            <meta property="og:url" content="https://soundlink.band/investors" />
+            <meta property="og:type" content="website" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="SoundLink Music | Investor Deck" />
+            <meta name="twitter:description" content={isES
+              ? "Las empresas gastan millones en música. Nosotros medimos si funciona."
+              : "Companies spend millions on music. We measure if it works."} />
+            <meta name="twitter:image" content="https://soundlink.band/portada.png" />
+
+            {/* Favicon */}
+            <link rel="icon" href="/soundlink-icono.gif" type="image/gif" />
+            <link rel="shortcut icon" href="/soundlink-icono.gif" type="image/gif" />
+
             {/* ════════════════════════════════════════════════════════════════════════
           PREMIUM NAV
       ════════════════════════════════════════════════════════════════════════ */}
