@@ -756,20 +756,20 @@ export default function InvestorDeckFinal() {
                         </div>
                         {[
                             {
-                                time: '6–12 meses',
+                                time: isES ? '6–12 meses' : '6–12 months',
                                 mrr: '50K – 150K€ MRR',
-                                mix: '75% España + 25% Latam',
+                                mix: isES ? '75% España + 25% Latam' : '75% Spain + 25% Latam',
                                 focus: isES ? 'Hotels · Canarias + Madrid' : 'Hotels · Canary Islands + Madrid',
                             },
                             {
-                                time: '12–24 meses',
+                                time: isES ? '12–24 meses' : '12–24 months',
                                 mrr: '150K – 350K€ MRR',
-                                mix: '60% España + 40% Latam',
+                                mix: isES ? '60% España + 40% Latam' : '60% Spain + 40% Latam',
                                 focus: isES ? 'Hotels + Marcas + Promotores' : 'Hotels + Brands + Promoters',
                                 featured: true,
                             },
                             {
-                                time: '36–60 meses',
+                                time: isES ? '36–60 meses' : '36–60 months',
                                 mrr: '+10M ARR',
                                 mix: '50% EU + 25% Latam + 25% US',
                                 focus: isES ? 'Global PMS/ERP · SoundPass' : 'Global PMS/ERP · SoundPass',
