@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const ogImage = "https://soundlink.band/soundlink-icono.gif";
+const ogImage = "https://soundlink.band/portada.png";
 
 export async function generateMetadata({
   params,
@@ -11,19 +11,19 @@ export async function generateMetadata({
   const isES = locale === "es";
 
   return {
-    title: isES
-      ? "SoundLink Music | Investor Deck"
-      : "SoundLink Music | Investor Deck",
+    title: "SoundLink Music | Investor Deck",
     description: isES
-      ? "Las empresas gastan millones en música. Nadie mide si funciona. Nosotros lo cambiamos."
-      : "Companies spend millions on music. No one measures if it works. We change that.",
+      ? "Las empresas gastan millones en música. Nosotros medimos si funciona. €100K Pre-Seed 2026."
+      : "Companies spend millions on music. We measure if it works. €100K Pre-Seed 2026.",
+    icons: {
+      icon: "/soundlink-icono.gif",
+      shortcut: "/soundlink-icono.gif",
+    },
     openGraph: {
-      title: isES
-        ? "SoundLink Music | Investor Deck"
-        : "SoundLink Music | Investor Deck",
+      title: "SoundLink Music | Investor Deck",
       description: isES
-        ? "Las empresas gastan millones en música. Nadie mide si funciona. Nosotros lo cambiamos."
-        : "Companies spend millions on music. No one measures if it works. We change that.",
+        ? "Las empresas gastan millones en música. Nosotros medimos si funciona. €100K Pre-Seed 2026."
+        : "Companies spend millions on music. We measure if it works. €100K Pre-Seed 2026.",
       url: "https://soundlink.band/investors",
       type: "website",
       images: [
@@ -37,12 +37,10 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: isES
-        ? "SoundLink Music | Investor Deck"
-        : "SoundLink Music | Investor Deck",
+      title: "SoundLink Music | Investor Deck",
       description: isES
-        ? "Las empresas gastan millones en música. Nadie mide si funciona. Nosotros lo cambiamos."
-        : "Companies spend millions on music. No one measures if it works. We change that.",
+        ? "Las empresas gastan millones en música. Nosotros medimos si funciona. €100K Pre-Seed 2026."
+        : "Companies spend millions on music. We measure if it works. €100K Pre-Seed 2026.",
       images: [ogImage],
     },
   };
