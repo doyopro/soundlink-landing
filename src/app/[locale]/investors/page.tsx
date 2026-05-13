@@ -24,6 +24,9 @@ import {
     Sparkles,
     Calendar,
     Mail,
+    DollarSign,
+    X,
+    MapPin,
 } from 'lucide-react'
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -251,15 +254,15 @@ export default function InvestorDeckV7() {
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
                         {[
-                            { val: '+850K€', label: isES ? 'Gestionados' : 'Managed', icon: '💰' },
-                            { val: '+8.000', label: isES ? 'Gigs Ejecutados' : 'Gigs Executed', icon: '🎵' },
-                            { val: '20%', label: isES ? 'Margen Neto' : 'Net Margin', icon: '📈' },
-                            { val: '0%', label: isES ? 'Riesgo Legal' : 'Legal Risk', icon: '✅' },
-                            { val: '+2 Años', label: isES ? 'LTV Retención' : 'LTV Retention', icon: '🔁' },
-                            { val: '100%', label: 'Compliance', icon: '🛡️' },
-                        ].map(({ val, label, icon }, i) => (
-                            <div key={i} className="p-6 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/40 transition-all text-center">
-                                <p className="text-3xl mb-3">{icon}</p>
+                            { val: '+850K€', label: isES ? 'Gestionados' : 'Managed', Icon: DollarSign },
+                            { val: '+8.000', label: isES ? 'Gigs Ejecutados' : 'Gigs Executed', Icon: Music },
+                            { val: '20%', label: isES ? 'Margen Neto' : 'Net Margin', Icon: TrendingUp },
+                            { val: '0%', label: isES ? 'Riesgo Legal' : 'Legal Risk', Icon: CheckCircle2 },
+                            { val: '+2 Años', label: isES ? 'LTV Retención' : 'LTV Retention', Icon: RefreshCw },
+                            { val: '100%', label: 'Compliance', Icon: ShieldCheck },
+                        ].map(({ val, label, Icon }, i) => (
+                            <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/40 transition-all text-center">
+                                <Icon className="w-6 h-6 text-blue-400 mx-auto mb-3" />
                                 <p className="text-2xl font-black text-white mb-2">{val}</p>
                                 <p className="text-xs text-gray-400 font-bold uppercase">{label}</p>
                             </div>
@@ -368,9 +371,12 @@ export default function InvestorDeckV7() {
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Before */}
                         <div className="p-10 rounded-2xl bg-white/5 border border-red-500/20">
-                            <p className="text-sm font-bold text-red-400 uppercase tracking-wider mb-8">
-                                ❌ {isES ? 'Sin SoundBand (Hoy)' : 'Without SoundBand (Today)'}
-                            </p>
+                            <div className="flex items-center gap-2 mb-8">
+                                <X className="w-5 h-5 text-red-400" />
+                                <p className="text-sm font-bold text-red-400 uppercase tracking-wider">
+                                    {isES ? 'Sin SoundBand (Hoy)' : 'Without SoundBand (Today)'}
+                                </p>
+                            </div>
                             <ul className="space-y-4">
                                 {(isES
                                     ? [
@@ -395,7 +401,7 @@ export default function InvestorDeckV7() {
                                     ]
                                 ).map((item, i) => (
                                     <li key={i} className="flex gap-3">
-                                        <span className="text-red-400 font-bold mt-0.5">✕</span>
+                                        <X className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                                         <span className="text-gray-300">{item}</span>
                                     </li>
                                 ))}
@@ -404,9 +410,12 @@ export default function InvestorDeckV7() {
 
                         {/* After */}
                         <div className="p-10 rounded-2xl bg-white/5 border border-blue-500/20">
-                            <p className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-8">
-                                ✓ {isES ? 'Con SoundBand' : 'With SoundBand'}
-                            </p>
+                            <div className="flex items-center gap-2 mb-8">
+                                <CheckCircle2 className="w-5 h-5 text-blue-400" />
+                                <p className="text-sm font-bold text-blue-400 uppercase tracking-wider">
+                                    {isES ? 'Con SoundBand' : 'With SoundBand'}
+                                </p>
+                            </div>
                             <ul className="space-y-4">
                                 {(isES
                                     ? [
@@ -431,7 +440,7 @@ export default function InvestorDeckV7() {
                                     ]
                                 ).map((item, i) => (
                                     <li key={i} className="flex gap-3">
-                                        <span className="text-blue-400 font-bold mt-0.5">✓</span>
+                                        <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                                         <span className="text-gray-300">{item}</span>
                                     </li>
                                 ))}
@@ -885,9 +894,12 @@ export default function InvestorDeckV7() {
 
                             {/* Canarias incentives */}
                             <div className="mt-8 p-6 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                                <p className="text-xs font-black text-amber-400 uppercase tracking-widest mb-3">
-                                    🏝️ ZEC · SODECAN · DEDUCCIONES I+D
-                                </p>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <MapPin className="w-4 h-4 text-amber-400" />
+                                    <p className="text-xs font-black text-amber-400 uppercase tracking-widest">
+                                        ZEC · SODECAN · DEDUCCIONES I+D
+                                    </p>
+                                </div>
                                 <p className="text-xs text-amber-300/90 leading-relaxed">
                                     {isES
                                         ? 'Startup en Canarias: Sodecan, deducciones I+D+i y Tax Lease. Multiplica impacto de cada euro privado sin dilución adicional de equity.'
