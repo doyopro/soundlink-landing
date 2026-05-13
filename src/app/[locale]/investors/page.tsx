@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
     ArrowRight,
     BrainCircuit,
@@ -152,7 +153,23 @@ function TeamCard({ name, role, photo, bio }: { name: string; role: string; phot
 // MAIN COMPONENT
 // ═════════════════════════════════════════════════════════════════════════════
 export default function InvestorDeckFinal() {
-    const isES = typeof window !== 'undefined' && window.location.pathname.includes('/es')
+    const [locale, setLocale] = useState<'es' | 'en'>('es')
+    const router = useRouter()
+
+    useEffect(() => {
+        const isES = typeof window !== 'undefined' && window.location.pathname.includes('/es')
+        setLocale(isES ? 'es' : 'en')
+    }, [])
+
+    const isES = locale === 'es'
+
+    const switchLanguage = (newLocale: 'es' | 'en') => {
+        setLocale(newLocale)
+        const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
+        const parts = pathname.split('/')
+        parts[1] = newLocale
+        router.push(parts.join('/'))
+    }
 
     const team = [
         {
@@ -238,8 +255,23 @@ export default function InvestorDeckFinal() {
                     <span className="text-[9px] uppercase tracking-[0.2em] text-slate-600 hidden sm:block">
                         {isES ? 'Presentación Privada' : 'Private Presentation'}
                     </span>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-full border border-white/20">
+                        <button
+                            onClick={() => switchLanguage('en')}
+                            className={`text-[10px] font-black transition-colors ${locale === 'en' ? 'text-white' : 'text-white/50 hover:text-white/70'}`}
+                        >
+                            🇬🇧 EN
+                        </button>
+                        <div className="w-px h-4 bg-white/20" />
+                        <button
+                            onClick={() => switchLanguage('es')}
+                            className={`text-[10px] font-black transition-colors ${locale === 'es' ? 'text-white' : 'text-white/50 hover:text-white/70'}`}
+                        >
+                            🇪🇸 ES
+                        </button>
+                    </div>
                     <Link
-                        href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                        href="https://calendar.app.google/3MWqCUTqt16YJQDE6"
                         target="_blank"
                         className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 transition-all text-xs font-black"
                     >
@@ -940,14 +972,14 @@ export default function InvestorDeckFinal() {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                         <Link
-                            href="mailto:nicolas@soundlink.band"
+                            href="mailto:nicolas.doyopro@gmail.com"
                             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-black rounded-full hover:bg-blue-500 hover:text-white transition-all text-base shadow-lg"
                         >
                             <Mail className="w-5 h-5" />
-                            nicolas@soundlink.band
+                            nicolas.doyopro@gmail.com
                         </Link>
                         <Link
-                            href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
+                            href="https://calendar.app.google/3MWqCUTqt16YJQDE6"
                             target="_blank"
                             className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/30 text-white font-black rounded-full hover:border-blue-400 hover:text-blue-400 transition-all text-base"
                         >
