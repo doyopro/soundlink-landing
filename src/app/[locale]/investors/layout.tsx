@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'SoundLink Music | Investor Deck',
   icons: {
-    icon: '/favicon.png',
-    shortcut: '/favicon.png',
+    icon: "/favicon.ico",
   },
   openGraph: {
-    images: [
-      {
-        url: '/portada.png',
-        width: 1200,
-        height: 630,
-      },
-    ],
+    images: [{
+      url: "https://soundlink.band/portada.png",
+      width: 1200,
+      height: 630,
+    }],
   },
   twitter: {
-    images: ['/portada.png'],
+    images: ["https://soundlink.band/portada.png"],
   },
 }
 
