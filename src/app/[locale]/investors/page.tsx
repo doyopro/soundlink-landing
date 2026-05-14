@@ -571,65 +571,105 @@ export default function InvestorDeckV8() {
                         </div>
                     </div>
 
-                    {/* Business Model */}
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-10">
-                        <h3 className="text-2xl font-black text-white mb-8">{isES ? 'Modelo de Negocio' : 'Business Model'}</h3>
+                    {/* Business Model - MEJORADO */}
+                    <div className="bg-gradient-to-br from-white/8 via-white/3 to-transparent border border-white/10 rounded-2xl p-12 relative overflow-hidden">
+                        {/* Gradient decoration */}
+                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl" />
+                        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/5 rounded-full blur-3xl" />
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                            {[
-                                {
-                                    name: 'Tier 1',
-                                    sessions: isES ? '1-2 sesiones/día' : '1-2 sessions/day',
-                                    example: isES ? 'Hotel 4★: jazz lobby viernes/sábado' : '4★ Hotel: jazz lobby Fri/Sat',
-                                },
-                                {
-                                    name: 'Tier 2',
-                                    sessions: isES ? '2-3 sesiones/día' : '2-3 sessions/day',
-                                    example: isES ? 'Resort 5★: brunch + dinner + gala' : '5★ Resort: brunch + dinner + gala',
-                                    featured: true,
-                                },
-                                {
-                                    name: 'Tier 3',
-                                    sessions: isES ? '3-5+ sesiones/día' : '3-5+ sessions/day',
-                                    example: isES ? 'Gran evento: multi-venue, multi-horario' : 'Multi-venue, multi-time events',
-                                },
-                            ].map(({ name, sessions, example, featured }, i) => (
-                                <div
-                                    key={i}
-                                    className={`p-10 rounded-lg border transition-all ${featured
-                                        ? 'bg-blue-600/10 border-blue-500/40 ring-2 ring-blue-500/20'
-                                        : 'bg-white/3 border-white/10 hover:border-blue-500/30'
-                                        }`}
-                                >
-                                    <p className="font-black text-white mb-2">{name}</p>
-                                    <p className={`${featured ? 'text-sm' : 'text-xs'} text-blue-400 font-bold mb-3`}>{sessions}</p>
-                                    <p className="text-sm text-gray-400">{example}</p>
-                                </div>
-                            ))}
-                        </div>
+                        <div className="relative z-10">
+                            <h3 className="text-3xl font-black text-white mb-2">{isES ? 'Planes de Producción' : 'Production Plans'}</h3>
+                            <p className="text-sm text-gray-400 mb-10 font-semibold uppercase tracking-widest">{isES ? 'Diseñados para cada tipo de venue' : 'Tailored to every venue type'}</p>
 
-                        {/* Revenue Model */}
-                        <div className="bg-white/3 rounded-lg p-10 border border-white/10">
-                            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">
-                                {isES ? 'Distribución de Revenue' : 'Revenue Distribution'}
-                            </p>
-                            <div className="grid grid-cols-3 gap-6 text-center mb-6">
+                            <div className="grid md:grid-cols-3 gap-8 mb-12">
                                 {[
-                                    { label: isES ? 'Al Artista' : 'Artist', pct: '70%' },
-                                    { label: isES ? 'Operación' : 'Operations', pct: '10%' },
-                                    { label: isES ? 'SoundLink' : 'SoundLink', pct: '20%' },
-                                ].map(({ label, pct }, i) => (
-                                    <div key={i}>
-                                        <p className="text-4xl font-black text-white mb-1">{pct}</p>
-                                        <p className="text-sm text-gray-400">{label}</p>
+                                    {
+                                        name: isES ? 'Plan Boutique' : 'Boutique Plan',
+                                        sessions: isES ? '1-2 sesiones/día' : '1-2 sessions/day',
+                                        example: isES ? 'Hotel 4★: jazz en lobby viernes y sábado' : '4★ Hotel: jazz lobby Fri/Sat',
+                                        icon: '🎵',
+                                    },
+                                    {
+                                        name: isES ? 'Plan Premium' : 'Premium Plan',
+                                        sessions: isES ? '2-3 sesiones/día' : '2-3 sessions/day',
+                                        example: isES ? 'Resort 5★: brunch acústico + cena con DJs + gala' : '5★ Resort: acoustic brunch + DJ dinner + gala',
+                                        icon: '✨',
+                                        featured: true,
+                                    },
+                                    {
+                                        name: isES ? 'Plan Enterprise' : 'Enterprise Plan',
+                                        sessions: isES ? '3-5+ sesiones/día' : '3-5+ sessions/day',
+                                        example: isES ? 'Eventos multi-venue, multi-horario, custom' : 'Multi-venue, multi-time, custom events',
+                                        icon: '⚡',
+                                    },
+                                ].map(({ name, sessions, example, icon, featured }, i) => (
+                                    <div
+                                        key={i}
+                                        className={`relative p-8 rounded-xl border transition-all group ${featured
+                                            ? 'bg-gradient-to-br from-blue-600/20 to-blue-600/5 border-blue-500/50 ring-2 ring-blue-500/30 shadow-lg shadow-blue-500/10'
+                                            : 'bg-white/5 border-white/15 hover:border-blue-500/40 hover:bg-white/8'
+                                        }`}
+                                    >
+                                        <div className="absolute -top-4 -right-4 text-5xl opacity-20">{icon}</div>
+
+                                        <div className="relative z-10">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <h4 className="font-black text-white text-xl">{name}</h4>
+                                                {featured && <span className="text-xs font-black text-blue-400 bg-blue-500/20 px-3 py-1 rounded-full">RECOMENDADO</span>}
+                                            </div>
+                                            <p className="text-sm text-blue-400 font-bold mb-3">{sessions}</p>
+                                            <p className="text-sm text-gray-300 leading-relaxed">{example}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-sm text-gray-500 text-center">
-                                {isES
-                                    ? 'Mín. 190€/gig · 10–20 gigs/mes típico = 1.900–3.800€ MRR por venue'
-                                    : 'Min. €190/gig · 10–20 gigs/month typical = €1,900–€3,800 MRR per venue'}
-                            </p>
+
+                            <div className="bg-gradient-to-r from-white/5 to-white/2 rounded-xl p-10 border border-white/10 backdrop-blur-sm">
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-8 text-center">
+                                    {isES ? '💰 Modelo de Revenue por Sesión' : '💰 Revenue Model per Session'}
+                                </p>
+
+                                <div className="grid grid-cols-3 gap-6 mb-8">
+                                    {[
+                                        { label: isES ? 'Al Artista' : 'Artist', pct: '70%', color: 'from-purple-500/30' },
+                                        { label: isES ? 'Operación' : 'Operations', pct: '10%', color: 'from-blue-500/30' },
+                                        { label: 'SoundLink', pct: '20%', color: 'from-emerald-500/30' },
+                                    ].map(({ label, pct, color }, i) => (
+                                        <div key={i} className={`bg-gradient-to-br ${color} to-transparent rounded-lg p-6 text-center border border-white/10`}>
+                                            <p className="text-4xl font-black text-white mb-2">{pct}</p>
+                                            <p className="text-sm text-gray-300 font-semibold">{label}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="border-t border-white/10 pt-6 text-center">
+                                    <p className="text-sm text-gray-300 font-semibold mb-2">
+                                        {isES ? 'Mínimo 190€ por sesión' : 'Minimum €190 per session'}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                        {isES
+                                            ? '10–20 sesiones/mes típico = 1.900–3.800€ MRR por venue'
+                                            : '10–20 sessions/month typical = €1,900–€3,800 MRR per venue'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-10 pt-8 border-t border-white/10">
+                                <p className="text-sm font-black text-white mb-6 uppercase tracking-wider">
+                                    {isES ? 'Incluido en todos los planes' : 'Included in all plans'}
+                                </p>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {(isES
+                                        ? ['Conceptualización artística', 'Booking inteligente con IA', 'Producción y logística', 'Seguros e invoicing', 'Social content grabado', 'Soporte 24/7 especializado']
+                                        : ['Artistic conceptualization', 'AI-powered booking', 'Production & logistics', 'Insurance & invoicing', 'Branded social content', '24/7 Specialized support']
+                                    ).map((item, i) => (
+                                        <div key={i} className="flex gap-3 items-start">
+                                            <span className="text-blue-400 font-black mt-0.5">✓</span>
+                                            <span className="text-sm text-gray-300">{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
