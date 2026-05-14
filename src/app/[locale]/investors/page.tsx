@@ -539,8 +539,8 @@ export default function InvestorDeckV8() {
                                         Icon: Zap,
                                         title: isES ? 'Sustitución Automática' : 'Automatic Substitution',
                                         desc: isES
-                                            ? 'Ante cancelación: sistema detecta, encuentra alternativa validada, reasigna en <2h. La operación no se detiene.'
-                                            : 'On cancellation: system detects, finds validated alternative, reassigns in <2h. Operation never stops.',
+                                            ? 'Soporte especializado 24/7: nuestros agentes resuelven cualquier imprevisto en tiempo real'
+                                            : '24/7 Specialized Support: our agents resolve any issue in real time',
                                     },
                                     {
                                         Icon: ShieldCheck,
@@ -575,7 +575,7 @@ export default function InvestorDeckV8() {
                     <div className="bg-white/5 border border-white/10 rounded-xl p-10">
                         <h3 className="text-2xl font-black text-white mb-8">{isES ? 'Modelo de Negocio' : 'Business Model'}</h3>
 
-                        <div className="grid md:grid-cols-3 gap-6 mb-10">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                             {[
                                 {
                                     name: 'Tier 1',
@@ -596,21 +596,21 @@ export default function InvestorDeckV8() {
                             ].map(({ name, sessions, example, featured }, i) => (
                                 <div
                                     key={i}
-                                    className={`p-6 rounded-lg border transition-all ${featured
+                                    className={`p-10 rounded-lg border transition-all ${featured
                                         ? 'bg-blue-600/10 border-blue-500/40 ring-2 ring-blue-500/20'
                                         : 'bg-white/3 border-white/10 hover:border-blue-500/30'
                                         }`}
                                 >
                                     <p className="font-black text-white mb-2">{name}</p>
-                                    <p className="text-xs text-blue-400 font-bold mb-3">{sessions}</p>
-                                    <p className="text-xs text-gray-400">{example}</p>
+                                    <p className={`${featured ? 'text-sm' : 'text-xs'} text-blue-400 font-bold mb-3`}>{sessions}</p>
+                                    <p className="text-sm text-gray-400">{example}</p>
                                 </div>
                             ))}
                         </div>
 
                         {/* Revenue Model */}
-                        <div className="bg-white/3 rounded-lg p-6 border border-white/10">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">
+                        <div className="bg-white/3 rounded-lg p-10 border border-white/10">
+                            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">
                                 {isES ? 'Distribución de Revenue' : 'Revenue Distribution'}
                             </p>
                             <div className="grid grid-cols-3 gap-6 text-center mb-6">
@@ -620,12 +620,12 @@ export default function InvestorDeckV8() {
                                     { label: isES ? 'SoundLink' : 'SoundLink', pct: '20%' },
                                 ].map(({ label, pct }, i) => (
                                     <div key={i}>
-                                        <p className="text-2xl font-black text-white mb-1">{pct}</p>
-                                        <p className="text-xs text-gray-400">{label}</p>
+                                        <p className="text-4xl font-black text-white mb-1">{pct}</p>
+                                        <p className="text-sm text-gray-400">{label}</p>
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-xs text-gray-500 text-center">
+                            <p className="text-sm text-gray-500 text-center">
                                 {isES
                                     ? 'Mín. 190€/gig · 10–20 gigs/mes típico = 1.900–3.800€ MRR por venue'
                                     : 'Min. €190/gig · 10–20 gigs/month typical = €1,900–€3,800 MRR per venue'}
