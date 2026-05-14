@@ -344,8 +344,8 @@ export default function InvestorDeckV8() {
                                 Icon: Lock,
                                 title: isES ? 'Riesgo legal acumulado' : 'Accumulated legal liability',
                                 desc: isES
-                                    ? 'Sony v. Marriott evidenció riesgos. Sin contratos validados, seguros ni licencias SGAE/BIEM verificadas, cada evento es pasivo legal desconocido.'
-                                    : 'Sony v. Marriott exposed the risk. No validated contracts, insurance or verified SGAE/BIEM licenses. Every event is hidden legal liability.',
+                                    ? 'Sony v. Marriott evidenció riesgos. Sin contratos validados, seguros ni compliance legal y auditoría de licencias verificados, cada evento es pasivo legal desconocido.'
+                                    : 'Sony v. Marriott exposed the risk. No validated contracts, insurance or verified legal compliance and license auditing. Every event is hidden legal liability.',
                             },
                             {
                                 num: '03',
@@ -410,7 +410,7 @@ export default function InvestorDeckV8() {
                                         'Cero trazabilidad de ROI o impacto',
                                         'Caos si hay cancelación o imprevisto',
                                         'Múltiples invoices, contabilidad fragmentada',
-                                        'Cero compliance SGAE/BIEM auditable',
+                                        'Cero compliance legal auditable',
                                     ]
                                     : [
                                         'Social director picks artist from Instagram',
@@ -420,7 +420,7 @@ export default function InvestorDeckV8() {
                                         'Zero ROI traceability or impact',
                                         'Chaos if cancellation or issue occurs',
                                         'Multiple invoices, fragmented accounting',
-                                        'Zero auditable SGAE/BIEM compliance',
+                                        'Zero auditable legal compliance',
                                     ]
                                 ).map((item, i) => (
                                     <li key={i} className="flex gap-3">
@@ -449,7 +449,7 @@ export default function InvestorDeckV8() {
                                         'Dashboard ROI con métricas post-evento',
                                         'Sustitución automática en < 2 horas',
                                         'Una factura mensual unificada',
-                                        '100% compliance SGAE/BIEM automatizado',
+                                        '100% compliance legal automatizado',
                                     ]
                                     : [
                                         'AI + curator selects by Brand DNA + KPIs',
@@ -459,7 +459,7 @@ export default function InvestorDeckV8() {
                                         'ROI dashboard with post-event metrics',
                                         'Automatic substitution in < 2 hours',
                                         'Single unified monthly invoice',
-                                        '100% automated SGAE/BIEM compliance',
+                                        '100% automated legal compliance',
                                     ]
                                 ).map((item, i) => (
                                     <li key={i} className="flex gap-3">
@@ -501,7 +501,7 @@ export default function InvestorDeckV8() {
                                     ? [
                                         'Matching inteligente: Brand DNA + KPIs + presupuesto',
                                         'Contratos auto-generados, validados, auditables',
-                                        'Seguros y licencias SGAE/BIEM incluidas y verificadas',
+                                        'Seguros y compliance legal y auditoría de licencias incluidos',
                                         'Dashboard ROI: impacto en ocupación, NPS, ticket medio',
                                         'Sustitución agéntica automática ante cancelaciones',
                                         'Facturación única mensual consolidada',
@@ -509,7 +509,7 @@ export default function InvestorDeckV8() {
                                     : [
                                         'Intelligent matching: Brand DNA + KPIs + budget',
                                         'Auto-generated, validated, auditable contracts',
-                                        'Insurance and verified SGAE/BIEM licenses included',
+                                        'Insurance and legal compliance and license auditing included',
                                         'ROI dashboard: occupancy, NPS, ticket average impact',
                                         'Automatic agentic substitution on cancellations',
                                         'Single consolidated monthly invoice',
