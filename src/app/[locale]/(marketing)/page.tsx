@@ -1,216 +1,449 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import {
-  ArrowRight,
-  Music,
-  BarChart3,
-  Zap,
-  Shield,
-  Globe,
-  Layers,
-  Users,
-  TrendingUp,
-  CheckCircle2,
-  Sparkles,
-  Calendar,
-  Mail,
-  Code,
-  Database,
-  Target,
-  Rocket,
+  ShieldCheck, BrainCircuit, Zap, BarChart3, CheckCircle2, ArrowRight,
+  Music, Users, Globe, TrendingUp, Briefcase, AlertCircle, Lock,
+  Database, Cpu, MapPin, Phone, Mail, ChevronDown, Play
 } from 'lucide-react'
+import Link from 'next/link'
 
-export default function CorporateLanding() {
-  const isES = typeof window !== 'undefined' && window.location.pathname.includes('/es')
+const dict = {
+  es: {
+    nav: { contact: 'Contacto', tagline: 'Infraestructura B2B para Entretenimiento en Vivo' },
+    hero: {
+      badge: 'SoundLink Music S.L. · 2026',
+      headline: 'La música como ventaja competitiva',
+      subheadline: 'Infraestructura B2B que conecta marcas, artistas y experiencias. Automatización, compliance y datos como potenciadores de crecimiento.',
+      cta1: 'Explorar SoundBand',
+      cta2: 'Solicitar Demo'
+    },
+    problem: {
+      title: 'El Problema Crítico',
+      subtitle: 'Fragmentación, falta de datos y riesgo legal en operaciones de entretenimiento en vivo',
+      sections: [
+        {
+          heading: 'Para Empresas & Marcas',
+          points: [
+            'Experiencias inconsistentes en múltiples ubicaciones',
+            'Cero visibilidad de ROI en inversiones musicales',
+            'Riesgo legal acumulado (Sony v. Marriott)',
+            'Coordinación manual fragmentada (WhatsApp, emails, PDFs)',
+            'Imposible medir impacto en ocupación, consumo, NPS'
+          ]
+        },
+        {
+          heading: 'Para Artistas & Comunidad Musical',
+          points: [
+            'Modelos artesanales sin escalabilidad',
+            'Falta de datos sobre patrones de demanda',
+            'Pagos fragmentados y sin trazabilidad',
+            'Sin acceso a información de oportunidades reales',
+            'Dependencia de intermediarios poco tecnológicos'
+          ]
+        }
+      ]
+    },
+    opportunity: {
+      title: 'La Oportunidad Convergente',
+      intro: 'Dos mercados record se encuentran sin infraestructura inteligente',
+      markets: [
+        { label: 'Turismo Global', value: '1.52B visitantes' },
+        { label: 'Live Music Global', value: '$38.2B mercado' },
+        { label: 'España Turismo', value: '97M visitantes 2025' },
+        { label: 'España Live Music', value: '€725M récord' }
+      ]
+    },
+    solution: {
+      title: 'SoundBand: Solución Integral',
+      subtitle: 'No es agencia. No es marketplace. Es la capa de infraestructura que conecta empresas, artistas y datos.',
+      intro: 'Automatiza 100% del ciclo de vida operativo con plataformas, tech e IA como potenciadores',
+      pillars: [
+        {
+          icon: BrainCircuit,
+          title: 'Matching Inteligente',
+          desc: 'IA que cruza Brand DNA, KPIs comerciales y disponibilidad de talento verificado.'
+        },
+        {
+          icon: Database,
+          title: 'Red de Talento Validada',
+          desc: '500+ artistas con históricos de ejecución, patrones venue-artista, datos operacionales.'
+        },
+        {
+          icon: ShieldCheck,
+          title: 'Compliance 100% Automático',
+          desc: 'Validación de contratos, seguros y requisitos legales en tiempo real. Cero riesgo.'
+        },
+        {
+          icon: BarChart3,
+          title: 'Pagos Unificados & Analytics',
+          desc: 'Una factura mensual consolidada. Múltiples pagos a artistas. ROI medible.'
+        },
+        {
+          icon: Zap,
+          title: 'Orquestación Centralizada',
+          desc: 'Calendario inteligente, sustituciones automáticas (< 2h), coordinación end-to-end.'
+        },
+        {
+          icon: TrendingUp,
+          title: 'Impacto Medible en Negocio',
+          desc: 'Conecta programación musical con métricas: ocupación, consumo, engagement, NPS.'
+        }
+      ]
+    },
+    methodology: {
+      title: 'Metodología: Auditoría → Diseño → Operación',
+      steps: [
+        {
+          title: 'Auditoría Estratégica',
+          desc: 'Analizamos Brand DNA, objetivos comerciales, gaps operacionales actuales.'
+        },
+        {
+          title: 'Diseño de Experiencia',
+          desc: 'Definimos estrategia musical, segmentos, géneros, kpis y arquitectura de contenido.'
+        },
+        {
+          title: 'Operación Automatizada',
+          desc: 'SoundBand ejecuta: matching, contratos, pagos, calendarios, reportes, compliance.'
+        }
+      ]
+    },
+    differentiators: {
+      title: '¿Por Qué SoundLink?',
+      points: [
+        {
+          title: '+8.000 Operaciones Ejecutadas',
+          desc: 'Dataset no replicable. Patterns venue-artista-guest. Workflows probados.'
+        },
+        {
+          title: '100% Compliance & Cero Riesgo Legal',
+          desc: 'SGAE/BIEM compliant. 0 incidencias legales. Automation auditable.'
+        },
+        {
+          title: 'Tech & IA como Potenciadores',
+          desc: 'Plataformas inteligentes que optimizan decisiones, no reemplazan humanos.'
+        },
+        {
+          title: 'Enfoque B2B Integral',
+          desc: 'No solo booking. Estrategia, datos, sostenibilidad y growth real para partners.'
+        }
+      ]
+    },
+    faq: {
+      title: 'Preguntas Frecuentes',
+      items: [
+        { q: '¿Qué es realmente SoundBand?', a: 'Infraestructura operativa que automatiza booking, compliance, pagos y medición de impacto. No es agencia ni marketplace.' },
+        { q: '¿Reemplazan agencias?', a: 'No. Unificamos operaciones fragmentadas. Algunos partners siguen con agencias pero a través de SoundBand.' },
+        { q: '¿Cómo se mide el ROI?', a: 'Analytics operacionales: costo por evento, impacto en ocupación, consumo promedio, NPS, retención cliente.' },
+        { q: '¿Para quién es?', a: 'Hoteles, grupos hospitality, venues, restaurantes, marcas moda/finanzas, cualquier empresa que programe entretenimiento.' },
+        { q: '¿Multi-venue?', a: 'Sí. Orquestación multi-ubicación es core. Un CFO ve una línea de gasto, gestión distribuida.' },
+        { q: '¿Qué incluye cada plan?', a: 'Conceptualización, contenido branded, booking, producción, seguro, facturación, reporting en una sola plataforma.' }
+      ]
+    },
+    cta: {
+      headline: 'Infraestructura del futuro',
+      subline: 'para operaciones de entretenimiento en vivo.',
+      btn1: 'Explorar SoundBand',
+      btn2: 'Solicitar Demostración Privada'
+    },
+    footer: {
+      text: 'SoundLink Music S.L. · Islas Canarias, España',
+      powered: 'Powered by DOYO.PRO'
+    }
+  },
+  en: {
+    nav: { contact: 'Contact', tagline: 'B2B Infrastructure for Live Entertainment' },
+    hero: {
+      badge: 'SoundLink Music S.L. · 2026',
+      headline: 'Music as competitive advantage',
+      subheadline: 'B2B infrastructure connecting brands, artists and experiences. Automation, compliance and data as growth enablers.',
+      cta1: 'Explore SoundBand',
+      cta2: 'Request Demo'
+    },
+    problem: {
+      title: 'The Critical Problem',
+      subtitle: 'Fragmentation, lack of data and legal risk in live entertainment operations',
+      sections: [
+        {
+          heading: 'For Companies & Brands',
+          points: [
+            'Inconsistent experiences across multiple locations',
+            'Zero visibility of ROI on music investments',
+            'Accumulated legal risk (Sony v. Marriott)',
+            'Fragmented manual coordination (WhatsApp, emails, PDFs)',
+            'Impossible to measure impact on occupancy, spend, NPS'
+          ]
+        },
+        {
+          heading: 'For Artists & Music Community',
+          points: [
+            'Artisanal models without scalability',
+            'Lack of data on real demand patterns',
+            'Fragmented payments without traceability',
+            'No access to real opportunity information',
+            'Dependence on non-tech intermediaries'
+          ]
+        }
+      ]
+    },
+    opportunity: {
+      title: 'The Convergent Opportunity',
+      intro: 'Two record markets meet without intelligent infrastructure',
+      markets: [
+        { label: 'Global Tourism', value: '1.52B visitors' },
+        { label: 'Global Live Music', value: '$38.2B market' },
+        { label: 'Spain Tourism', value: '97M visitors 2025' },
+        { label: 'Spain Live Music', value: '€725M record' }
+      ]
+    },
+    solution: {
+      title: 'SoundBand: Integral Solution',
+      subtitle: 'Not an agency. Not a marketplace. The infrastructure layer that connects companies, artists and data.',
+      intro: 'Automates 100% of the operational lifecycle with platforms, tech and AI as enablers',
+      pillars: [
+        {
+          icon: BrainCircuit,
+          title: 'Intelligent Matching',
+          desc: 'AI that crosses Brand DNA, commercial KPIs and verified talent availability.'
+        },
+        {
+          icon: Database,
+          title: 'Validated Talent Network',
+          desc: '500+ artists with execution history, venue-artist patterns, operational data.'
+        },
+        {
+          icon: ShieldCheck,
+          title: '100% Automated Compliance',
+          desc: 'Real-time validation of contracts, insurance and legal requirements. Zero risk.'
+        },
+        {
+          icon: BarChart3,
+          title: 'Unified Payments & Analytics',
+          desc: 'One consolidated monthly invoice. Multiple artist payments. Measurable ROI.'
+        },
+        {
+          icon: Zap,
+          title: 'Centralized Orchestration',
+          desc: 'Smart scheduling, automatic substitutions (< 2h), end-to-end coordination.'
+        },
+        {
+          icon: TrendingUp,
+          title: 'Measurable Business Impact',
+          desc: 'Connect music programming to metrics: occupancy, spend, engagement, NPS.'
+        }
+      ]
+    },
+    methodology: {
+      title: 'Methodology: Audit → Design → Operation',
+      steps: [
+        {
+          title: 'Strategic Audit',
+          desc: 'We analyze Brand DNA, commercial goals, current operational gaps.'
+        },
+        {
+          title: 'Experience Design',
+          desc: 'We define music strategy, segments, genres, KPIs and content architecture.'
+        },
+        {
+          title: 'Automated Operation',
+          desc: 'SoundBand executes: matching, contracts, payments, calendars, reporting, compliance.'
+        }
+      ]
+    },
+    differentiators: {
+      title: 'Why SoundLink?',
+      points: [
+        {
+          title: '+8,000 Operations Executed',
+          desc: 'Non-replicable dataset. Venue-artist-guest patterns. Proven workflows.'
+        },
+        {
+          title: '100% Compliance & Zero Legal Risk',
+          desc: 'SGAE/BIEM compliant. 0 legal incidents. Auditable automation.'
+        },
+        {
+          title: 'Tech & AI as Enablers',
+          desc: 'Intelligent platforms that optimize decisions, don\'t replace humans.'
+        },
+        {
+          title: 'Integral B2B Approach',
+          desc: 'Not just booking. Strategy, data, sustainability and real growth for partners.'
+        }
+      ]
+    },
+    faq: {
+      title: 'Frequently Asked Questions',
+      items: [
+        { q: 'What exactly is SoundBand?', a: 'Operational infrastructure that automates booking, compliance, payments and impact measurement. Not an agency or marketplace.' },
+        { q: 'Do you replace agencies?', a: 'No. We unify fragmented operations. Some partners still work with agencies but through SoundBand.' },
+        { q: 'How is ROI measured?', a: 'Operational analytics: cost per event, occupancy impact, average spend, NPS, customer retention.' },
+        { q: 'Who is it for?', a: 'Hotels, hospitality groups, venues, restaurants, fashion/finance brands, any company that programs live entertainment.' },
+        { q: 'Multi-venue support?', a: 'Yes. Multi-location orchestration is core. One CFO sees one expense line, distributed management.' },
+        { q: 'What does each plan include?', a: 'Conceptualization, branded content, booking, production, insurance, invoicing, reporting in one platform.' }
+      ]
+    },
+    cta: {
+      headline: 'Infrastructure of the future',
+      subline: 'for live entertainment operations.',
+      btn1: 'Explore SoundBand',
+      btn2: 'Request Private Demo'
+    },
+    footer: {
+      text: 'SoundLink Music S.L. · Canary Islands, Spain',
+      powered: 'Powered by DOYO.PRO'
+    }
+  }
+}
+
+export default function CorporateLandingV4Final() {
+  const [scrolled, setScrolled] = useState(false)
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null)
+  const params = useParams()
+  const pathname = usePathname()
+  const router = useRouter()
+
+  const locale = (params?.locale as 'es' | 'en') || 'es'
+  const t = dict[locale] || dict.es
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const switchLang = (newLocale: string) => {
+    const newPath = pathname?.replace(/\/(es|en)\//, `/${newLocale}/`)
+    if (newPath) router.push(newPath)
+  }
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white antialiased overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#0f0f0f] text-white antialiased selection:bg-blue-600/30">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'DM Sans', sans-serif; }
+        .hero-title { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.02em; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fadeUp 0.8s ease-out forwards; }
+      `}</style>
+
       {/* ════════════════════════════════════════════════════════════════════════
           NAV
       ════════════════════════════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 h-16 border-b border-white/8 bg-[#0f0f0f]/95 backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <img src="/soundlink-icono.gif" alt="SoundLink" className="w-8 h-8" />
-          <div>
-            <p className="text-xs font-bold tracking-wider text-white">SOUNDLINK MUSIC</p>
-            <p className="text-[10px] text-gray-500 tracking-wider">{isES ? 'Music-Tech B2B' : 'Music-Tech B2B'}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => {
-              const newLocale = isES ? 'en' : 'es'
-              window.location.pathname = window.location.pathname.replace(
-                /\/(es|en)\//,
-                `/${newLocale}/`
-              )
-            }}
-            className="px-4 py-2 rounded-lg bg-white/8 hover:bg-white/15 transition-all text-xs font-semibold uppercase tracking-widest text-gray-300 hover:text-white border border-white/10 hover:border-white/20"
-          >
-            {isES ? '🇬🇧 EN' : '🇪🇸 ES'}
-          </button>
-
-          <Link
-            href="mailto:nicolas@soundlink.band"
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-lg text-xs font-bold uppercase tracking-wide transition-all"
-          >
-            <Mail className="w-4 h-4" />
-            {isES ? 'Contacto' : 'Contact'}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-white/8' : 'bg-transparent'
+        }`}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <img
+              src="/soundlink-icono.gif"
+              alt="SoundLink"
+              className="w-10 h-10 group-hover:scale-105 transition-transform"
+            />
+            <div>
+              <p className="text-sm font-black text-white">SOUNDLINK</p>
+              <p className="text-xs text-gray-400">{t.nav.tagline}</p>
+            </div>
           </Link>
+
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2 px-2 py-1.5 rounded-lg bg-white/5 border border-white/10">
+              {['es', 'en'].map(l => (
+                <button
+                  key={l}
+                  onClick={() => switchLang(l)}
+                  className={`px-2 py-1 text-xs font-bold uppercase transition-all ${locale === l ? 'text-white bg-white/10 rounded' : 'text-gray-400 hover:text-white'
+                    }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            <Link
+              href="mailto:nicolas@soundlink.band"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-all flex items-center gap-2"
+            >
+              <Mail className="w-4 h-4" />
+              {t.nav.contact}
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* ════════════════════════════════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════════════════════════════════ */}
-      <section className="relative pt-40 pb-32 px-8 bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f] overflow-hidden">
+      <section className="relative min-h-screen pt-20 pb-20 px-6 bg-gradient-to-br from-[#1a1a2e] via-[#0f0f0f] to-[#0f0f0f] overflow-hidden flex items-center">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-blue-600/8 rounded-full blur-[100px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-purple-600/5 rounded-full blur-[120px]" />
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[150px]" />
+          <div className="absolute bottom-20 right-1/3 w-[600px] h-[600px] bg-purple-600/3 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="mb-12 inline-flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10">
-            <Sparkles className="w-4 h-4 text-blue-400" />
-            <span className="text-xs font-bold text-gray-300">
-              {isES ? 'INFRAESTRUCTURA MUSIC-TECH' : 'MUSIC-TECH INFRASTRUCTURE'}
-            </span>
-          </div>
-
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.0] tracking-tight text-white mb-8 max-w-5xl">
-            {isES ? (
-              <>
-                La música<br />
-                <span className="text-blue-400">como ventaja competitiva</span>
-              </>
-            ) : (
-              <>
-                Music as<br />
-                <span className="text-blue-400">competitive advantage</span>
-              </>
-            )}
-          </h1>
-
-          <p className="text-lg text-gray-300 max-w-2xl mb-12 leading-relaxed">
-            {isES
-              ? 'Transformamos la gestión musical en operaciones medibles. Plataformas, asesoramiento y tecnología para empresas que quieren convertir la música en una herramienta estratégica de crecimiento.'
-              : 'We transform music management into measurable operations. Platforms, consulting and technology for companies that want to turn music into a strategic growth tool.'}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              href="https://www.soundband.pro/es"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg text-base font-bold uppercase tracking-wide transition-all"
-            >
-              {isES ? 'Ver SoundBand' : 'Explore SoundBand'}
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="https://www.soundlink.band/es/investors"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/30 text-white font-bold rounded-lg hover:border-blue-400 hover:text-blue-400 transition-all text-base uppercase tracking-wide"
-            >
-              {isES ? 'Investor Deck' : 'Investor Deck'}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════════════════
-          VISION & MISSION
-      ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-24 px-8 bg-[#0f0f0f] border-y border-white/8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-16">
-            {/* Mission */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <Rocket className="w-6 h-6 text-blue-400" />
-                <h2 className="text-2xl font-black text-white">{isES ? 'Misión' : 'Mission'}</h2>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                {isES
-                  ? 'Ser el sistema operativo estándar para la gestión musical B2B. Damos a empresas de cualquier tamaño las herramientas, datos e inteligencia para transformar la música en una ventaja competitiva medible.'
-                  : 'Be the standard operating system for B2B music management. We empower companies of any size with tools, data and intelligence to transform music into a measurable competitive advantage.'}
-              </p>
+        <div className="relative max-w-6xl mx-auto w-full">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+              <Music className="w-4 h-4 text-blue-400" />
+              <span className="text-xs font-bold text-gray-300">{t.hero.badge}</span>
             </div>
 
-            {/* Vision */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <Globe className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-black text-white">{isES ? 'Visión' : 'Vision'}</h2>
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                {isES
-                  ? 'Un mundo donde toda empresa usa música de forma estratégica, legal y rentable. Donde el caos operativo en la gestión musical no existe y los artistas reciben compensación justa.'
-                  : 'A world where every company uses music strategically, legally and profitably. Where operational chaos in music management doesn\'t exist and artists receive fair compensation.'}
-              </p>
+            {/* GIF PROMINENTE */}
+            <div className="mb-12">
+              <img
+                src="/soundlink-icono.gif"
+                alt="SoundLink"
+                className="w-32 h-32 mx-auto object-contain drop-shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+              />
+            </div>
+
+            <h1 className="hero-title text-white mb-8 max-w-4xl mx-auto leading-tight">
+              {t.hero.headline}
+            </h1>
+
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
+              {t.hero.subheadline}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="https://www.soundband.pro/es"
+                target="_blank"
+                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-base transition-all flex items-center justify-center gap-2"
+              >
+                {t.hero.cta1}
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="mailto:nicolas@soundlink.band"
+                className="px-8 py-4 border border-white/20 hover:border-blue-400 hover:text-blue-400 rounded-lg font-bold text-base transition-all"
+              >
+                {t.hero.cta2}
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════════════════════
-          WHAT WE DO
+          PROBLEM SECTION
       ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-8 bg-[#1a1a1a]">
+      <section className="py-24 px-6 bg-[#1a1a1a] border-t border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {isES ? '¿Qué hacemos?' : 'What We Do'}
-            </h2>
-            <p className="text-gray-300 text-lg max-w-2xl">
-              {isES
-                ? 'Tres pilares que transforman la música de gasto caótico en operación rentable.'
-                : 'Three pillars that transform music from chaotic expense into profitable operation.'}
-            </p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 mb-6">
+              <AlertCircle className="w-4 h-4 text-red-400" />
+              <span className="text-xs font-bold text-red-400 uppercase">{t.problem.title}</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{t.problem.subtitle}</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                Icon: Zap,
-                title: isES ? 'Plataformas de Operación' : 'Operational Platforms',
-                desc: isES
-                  ? 'SoundBand (Live Music OS) y SoundPass (Engagement Engine). Sistemas end-to-end que automatizan booking, compliance, facturación y ROI.'
-                  : 'SoundBand (Live Music OS) and SoundPass (Engagement Engine). End-to-end systems that automate booking, compliance, invoicing and ROI.',
-                features: isES
-                  ? ['Gestión 360° de talento', 'IA & Matching inteligente', 'Compliance automático', 'Analytics & ROI']
-                  : ['360° talent management', 'AI & intelligent matching', 'Automated compliance', 'Analytics & ROI'],
-              },
-              {
-                Icon: Shield,
-                title: isES ? 'Asesoramiento Estratégico' : 'Strategic Consulting',
-                desc: isES
-                  ? 'Auditorías de infraestructura, diseño de estrategias musicales y asesoramiento en compliance normativo.'
-                  : 'Infrastructure audits, music strategy design and regulatory compliance consulting.',
-                features: isES
-                  ? ['Auditoría de datos', 'Estrategia musical', 'Cumplimiento legal', 'Optimización de costos']
-                  : ['Data audit', 'Music strategy', 'Legal compliance', 'Cost optimization'],
-              },
-              {
-                Icon: Code,
-                title: isES ? 'Arquitectura a Medida' : 'Custom Architecture',
-                desc: isES
-                  ? 'Desarrollo de ERPs musicales, automatización agentic con IA e integraciones personalizadas para partners estratégicos.'
-                  : 'Music ERP development, agentic AI automation and custom integrations for strategic partners.',
-                features: isES
-                  ? ['ERPs personalizados', 'Automatización agentic', 'Integración legacy', 'APIs escalables']
-                  : ['Custom ERPs', 'Agentic automation', 'Legacy integration', 'Scalable APIs'],
-              },
-            ].map(({ Icon, title, desc, features }, i) => (
-              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all group">
-                <Icon className="w-10 h-10 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-xl font-black text-white mb-3">{title}</h3>
-                <p className="text-sm text-gray-300 mb-6 leading-relaxed">{desc}</p>
-                <ul className="space-y-2">
-                  {features.map((f, i) => (
-                    <li key={i} className="flex gap-2 items-start text-xs text-gray-400">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                      {f}
+          <div className="grid md:grid-cols-2 gap-8">
+            {t.problem.sections.map((section, i) => (
+              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10">
+                <h3 className="text-lg font-black text-white mb-6">{section.heading}</h3>
+                <ul className="space-y-3">
+                  {section.points.map((point, j) => (
+                    <li key={j} className="flex gap-3 text-gray-300 text-sm">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                      {point}
                     </li>
                   ))}
                 </ul>
@@ -221,44 +454,41 @@ export default function CorporateLanding() {
       </section>
 
       {/* ════════════════════════════════════════════════════════════════════════
-          SEGMENTS WE SERVE
+          OPPORTUNITY
       ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-8 bg-[#0f0f0f]">
+      <section className="py-24 px-6 bg-[#0f0f0f] border-t border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{t.opportunity.title}</h2>
+          <p className="text-lg text-gray-400 mb-12 max-w-2xl">{t.opportunity.intro}</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {t.opportunity.markets.map((m, i) => (
+              <div key={i} className="p-6 rounded-lg bg-white/5 border border-white/10 text-center">
+                <p className="text-2xl font-black text-blue-400 mb-2">{m.value}</p>
+                <p className="text-xs text-gray-400 font-bold">{m.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          SOUNDBAND SOLUTION
+      ════════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 bg-[#1a1a1a] border-t border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {isES ? 'Segmentos que Servimos' : 'Segments We Serve'}
-            </h2>
-            <p className="text-gray-300 text-lg max-w-2xl">
-              {isES
-                ? 'Cualquier empresa que contrata música en volumen tiene nuestro problema. Somos partners de:'
-                : 'Any company that contracts music at scale has our problem. We partner with:'}
-            </p>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{t.solution.title}</h2>
+            <p className="text-lg text-gray-400 mb-4">{t.solution.subtitle}</p>
+            <p className="text-base text-gray-500">{t.solution.intro}</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {(isES
-              ? [
-                { icon: '🏨', name: 'Hotelería', desc: 'Cadenas de lujo, resorts, boutique hotels' },
-                { icon: '🛍️', name: 'Retail', desc: 'Centros comerciales, tiendas, outlets' },
-                { icon: '🍽️', name: 'Restauración', desc: 'Restaurantes, bares, cafés, nightlife' },
-                { icon: '👗', name: 'Moda & Lujo', desc: 'Boutiques, showrooms, flagship stores' },
-                { icon: '🏦', name: 'Finanzas', desc: 'Bancos, fintechs, seguros, corporativos' },
-                { icon: '🎭', name: 'Entretenimiento', desc: 'Promotoras, productoras, eventos' },
-              ]
-              : [
-                { icon: '🏨', name: 'Hospitality', desc: 'Luxury chains, resorts, boutique hotels' },
-                { icon: '🛍️', name: 'Retail', desc: 'Malls, stores, outlets' },
-                { icon: '🍽️', name: 'Food & Beverage', desc: 'Restaurants, bars, cafés, nightlife' },
-                { icon: '👗', name: 'Fashion & Luxury', desc: 'Boutiques, showrooms, flagship stores' },
-                { icon: '🏦', name: 'Finance', desc: 'Banks, fintechs, insurance, corporate' },
-                { icon: '🎭', name: 'Entertainment', desc: 'Promoters, producers, events' },
-              ]
-            ).map(({ icon, name, desc }, i) => (
-              <div key={i} className="p-6 rounded-lg bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all text-center">
-                <p className="text-4xl mb-3">{icon}</p>
-                <h4 className="font-black text-white mb-2">{name}</h4>
-                <p className="text-xs text-gray-400">{desc}</p>
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {t.solution.pillars.map(({ icon: Icon, title, desc }, i) => (
+              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
+                <Icon className="w-10 h-10 text-blue-400 mb-4" />
+                <h3 className="text-lg font-black text-white mb-3">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -268,59 +498,67 @@ export default function CorporateLanding() {
       {/* ════════════════════════════════════════════════════════════════════════
           METHODOLOGY
       ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-8 bg-[#1a1a1a]">
+      <section className="py-24 px-6 bg-[#0f0f0f] border-t border-white/5">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {isES ? 'Metodología' : 'Methodology'}
-            </h2>
-            <p className="text-gray-300 text-lg max-w-2xl">
-              {isES
-                ? 'Tres fases que transforman tu infraestructura musical en un activo operativo.'
-                : 'Three phases that transform your music infrastructure into an operational asset.'}
-            </p>
-          </div>
+          <h2 className="text-3xl font-black text-white mb-12">{t.methodology.title}</h2>
 
-          <div className="space-y-8">
-            {[
-              {
-                num: '01',
-                title: isES ? 'Auditoría & Análisis' : 'Audit & Analysis',
-                desc: isES
-                  ? 'Mapeamos tu ecosistema actual: proveedores, contratos, cumplimiento normativo, fugas operativas. Identificamos oportunidades concretas de optimización.'
-                  : 'We map your current ecosystem: providers, contracts, compliance, operational leaks. We identify concrete optimization opportunities.',
-                Icon: Database,
-              },
-              {
-                num: '02',
-                title: isES ? 'Diseño & Implementación' : 'Design & Implementation',
-                desc: isES
-                  ? 'Construimos tu arquitectura tecnológica: automatización, matching inteligente, dashboards, integraciones. Entrenamos a tu equipo.'
-                  : 'We build your technology architecture: automation, intelligent matching, dashboards, integrations. We train your team.',
-                Icon: Layers,
-              },
-              {
-                num: '03',
-                title: isES ? 'Operación & Crecimiento' : 'Operation & Growth',
-                desc: isES
-                  ? 'Ejecutamos y escalamos: gestión operativa diaria, soporte 24/7, optimización continua basada en datos. Monitoreamos KPIs y ROI.'
-                  : 'We execute and scale: daily operations, 24/7 support, continuous data-driven optimization. We monitor KPIs and ROI.',
-                Icon: TrendingUp,
-              },
-            ].map(({ num, title, desc, Icon }, i) => (
-              <div key={i} className="flex gap-8 items-start p-8 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
-                    <p className="text-2xl font-black text-blue-400">{num}</p>
+          <div className="space-y-4">
+            {t.methodology.steps.map((step, i) => (
+              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+                    <p className="text-sm font-black text-blue-400">{String(i + 1).padStart(2, '0')}</p>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-black text-white mb-2">{step.title}</h3>
+                    <p className="text-gray-400">{step.desc}</p>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Icon className="w-6 h-6 text-blue-400" />
-                    <h3 className="text-xl font-black text-white">{title}</h3>
-                  </div>
-                  <p className="text-gray-300 leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          DIFFERENTIATORS
+      ════════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 bg-[#1a1a1a] border-t border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-black text-white mb-12">{t.differentiators.title}</h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {t.differentiators.points.map(({ title, desc }, i) => (
+              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10">
+                <h3 className="text-lg font-black text-white mb-3">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          FAQ
+      ════════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 bg-[#0f0f0f] border-t border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-black text-white mb-12">{t.faq.title}</h2>
+
+          <div className="space-y-3">
+            {t.faq.items.map(({ q, a }, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:border-blue-500/30 transition-all"
+                onClick={() => setOpenFAQ(openFAQ === i ? null : i)}
+              >
+                <div className="flex items-start justify-between">
+                  <h3 className="font-black text-white flex-1 text-base">{q}</h3>
+                  <ChevronDown className={`w-5 h-5 text-blue-400 shrink-0 ml-4 transition-transform ${openFAQ === i ? 'rotate-180' : ''}`} />
                 </div>
+                {openFAQ === i && (
+                  <p className="text-gray-400 text-sm mt-4 leading-relaxed">{a}</p>
+                )}
               </div>
             ))}
           </div>
@@ -328,127 +566,26 @@ export default function CorporateLanding() {
       </section>
 
       {/* ════════════════════════════════════════════════════════════════════════
-          MARKET OPPORTUNITY
+          CTA FINAL
       ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-8 bg-[#0f0f0f]">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {isES ? 'La Oportunidad' : 'The Opportunity'}
-            </h2>
-            <p className="text-gray-300 text-lg max-w-2xl">
-              {isES
-                ? 'Convergencia de dos mercados en explosión sin solución consolidada.'
-                : 'Convergence of two explosive markets with no consolidated solution.'}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            {[
-              { label: '$38.2B', desc: isES ? 'Live Music Global 2025' : 'Global Live Music 2025' },
-              { label: '$91.4B', desc: isES ? 'Music Tourism 2024' : 'Global Music Tourism 2024' },
-              { label: '€725M', desc: isES ? 'Live Music España 2024' : 'Live Music Spain 2024' },
-              { label: '97M', desc: isES ? 'Turistas España 2025' : 'Spain Tourists 2025' },
-            ].map(({ label, desc }, i) => (
-              <div key={i} className="p-8 rounded-lg bg-white/5 border border-white/10 text-center">
-                <p className="text-4xl font-black text-blue-400 mb-3">{label}</p>
-                <p className="text-sm text-gray-400">{desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-white/5 border border-white/10 rounded-xl p-10 text-center">
-            <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
-              {isES
-                ? 'SoundLink captura valor en la intersección del Live Music global y Hospitality & Turismo. Pero nuestro TAM se expande con cada industria que descubre que la gestión musical es un problema operativo, no solo creativo.'
-                : 'SoundLink captures value at the intersection of global Live Music and Hospitality & Tourism. But our TAM expands with every industry that discovers music management is an operational problem, not just creative.'}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════════════════
-          WHY SOUNDLINK
-      ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-8 bg-[#1a1a1a]">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {isES ? '¿Por qué SoundLink?' : 'Why SoundLink?'}
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                title: isES ? 'Experiencia operativa real' : 'Real operational experience',
-                desc: isES
-                  ? '8.000+ operaciones ejecutadas, 850k€+ gestionados, 2+ años de LTV validado sin capital externo.'
-                  : '8,000+ operations executed, €850k+ managed, 2+ years of validated LTV without external capital.',
-                Icon: CheckCircle2,
-              },
-              {
-                title: isES ? 'Infraestructura probada' : 'Proven infrastructure',
-                desc: isES
-                  ? 'Plataformas en producción, APIs estables, arquitectura escalable lista para crecer 10X.'
-                  : 'Production platforms, stable APIs, scalable architecture ready to grow 10X.',
-                Icon: Layers,
-              },
-              {
-                title: isES ? 'Dataset propietario' : 'Proprietary dataset',
-                desc: isES
-                  ? '50TB+ de datos sobre comportamiento venue-artista-guest. Moat que otros 18 meses no pueden replicar.'
-                  : '50TB+ data on venue-artist-guest behavior. Moat competitors can\'t replicate in 18 months.',
-                Icon: Database,
-              },
-              {
-                title: isES ? 'Equipo multidisciplinar' : 'Multidisciplinary team',
-                desc: isES
-                  ? 'Operadores B2B, ingenieros, expertos en cumplimiento, productores. No somos teóricos.'
-                  : 'B2B operators, engineers, compliance experts, producers. We\'re not theorists.',
-                Icon: Users,
-              },
-            ].map(({ title, desc, Icon }, i) => (
-              <div key={i} className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
-                <Icon className="w-8 h-8 text-blue-400 mb-4" />
-                <h3 className="text-xl font-black text-white mb-3">{title}</h3>
-                <p className="text-sm text-gray-300 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════════════════
-          CTA
-      ════════════════════════════════════════════════════════════════════════ */}
-      <section className="py-40 px-8 bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f]">
+      <section className="py-32 px-6 bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f] border-t border-white/5">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
-            {isES ? '¿Listo para transformar tu gestión musical?' : 'Ready to transform your music management?'}
-          </h2>
-
-          <p className="text-gray-300 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-            {isES
-              ? 'Hablemos sobre tu infraestructura actual y cómo SoundLink puede optimizarla.'
-              : 'Let\'s discuss your current infrastructure and how SoundLink can optimize it.'}
-          </p>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">{t.cta.headline}</h2>
+          <p className="text-2xl text-blue-400 font-black mb-12">{t.cta.subline}</p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="mailto:nicolas@soundlink.band"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-black rounded-lg hover:bg-blue-500 hover:text-white transition-all text-base"
+              href="https://www.soundband.pro/es"
+              target="_blank"
+              className="px-8 py-4 bg-white text-black font-black rounded-lg hover:bg-blue-400 transition-all"
             >
-              <Mail className="w-5 h-5" />
-              nicolas@soundlink.band
+              {t.cta.btn1}
             </Link>
             <Link
-              href="https://calendar.app.google/mpwxXhzTB7xB5Tfx9"
-              target="_blank"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/30 text-white font-black rounded-lg hover:border-blue-400 hover:text-blue-400 transition-all text-base"
+              href="mailto:nicolas@soundlink.band"
+              className="px-8 py-4 border border-white/20 text-white font-black rounded-lg hover:border-blue-400 hover:text-blue-400 transition-all"
             >
-              <Calendar className="w-5 h-5" />
-              {isES ? 'Agendar Consultoría' : 'Schedule Consultation'}
+              {t.cta.btn2}
             </Link>
           </div>
         </div>
@@ -457,11 +594,11 @@ export default function CorporateLanding() {
       {/* ════════════════════════════════════════════════════════════════════════
           FOOTER
       ════════════════════════════════════════════════════════════════════════ */}
-      <footer className="border-t border-white/8 py-8 px-8 bg-[#0f0f0f]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <span>© 2026 SoundLink Music S.L. · {isES ? 'Todos los derechos reservados' : 'All rights reserved'}</span>
-          <Link href="https://doyo.pro" target="_blank" className="hover:text-gray-400 transition-colors">
-            Powered by DOYO.PRO
+      <footer className="border-t border-white/5 py-8 px-6 bg-[#0f0f0f]">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+          <span>{t.footer.text}</span>
+          <Link href="https://doyo.pro" target="_blank" className="hover:text-gray-300 transition-colors">
+            {t.footer.powered}
           </Link>
         </div>
       </footer>
